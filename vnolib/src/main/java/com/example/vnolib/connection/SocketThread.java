@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,6 +51,7 @@ public class SocketThread {
             try (InputStream inputStream = connection.getSocket().getInputStream()) {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
+                int bytesFilled = 0;
                 while (connection.getStatus().equals(ConnectionStatus.CONNECTED)) {
                     int readReturnValue;
                     try {
@@ -63,15 +65,18 @@ public class SocketThread {
                         break;
                     }
                     byteBuffer.put((byte) readReturnValue);
+                    bytesFilled += 1;
                     if (readReturnValue == '%') {
                         try {
-                            BaseCommand command = CommandParser.parse(new String(byteBuffer.array()));
+                            byte[] commandBytes = Arrays.copyOfRange(byteBuffer.array(), 0, bytesFilled);
+                            BaseCommand command = CommandParser.parse(new String(commandBytes));
                             log.debug(command.toString());
                             connection.getCommandsToRead().put(command);
                         } catch (Exception ex) {
                             log.error("run: ", ex);
                         }
                         byteBuffer.clear();
+                        bytesFilled = 0;
                     }
                 }
             } catch (Exception ex) {

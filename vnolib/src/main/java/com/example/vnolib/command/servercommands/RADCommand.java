@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command is sent to request the location with specific id
+ */
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

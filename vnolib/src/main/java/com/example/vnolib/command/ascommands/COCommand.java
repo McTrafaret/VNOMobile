@@ -11,6 +11,9 @@ import java.util.Locale;
 
 import lombok.ToString;
 
+/**
+ * This command is used to authenticate at master server
+ */
 @ToString
 @Command(name = "CO", numOfArguments = 2)
 public class COCommand extends BaseCommand {

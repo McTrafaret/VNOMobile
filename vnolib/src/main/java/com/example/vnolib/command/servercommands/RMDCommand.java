@@ -4,15 +4,16 @@ import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
-@Command(name = "RMD", numOfArguments = 2)
+@AllArgsConstructor
+@NoArgsConstructor
+@Command(name = "RMD", numOfArguments = 1)
 public class RMDCommand extends BaseCommand {
 
     @CommandArgument(index = 0, optional = false)
-    String trackName;
-
-    @CommandArgument(index = 1, optional = false)
-    String trackLocation;
+    int trackId;
 }

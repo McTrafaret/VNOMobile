@@ -17,6 +17,10 @@ public class MyClass {
             Thread.sleep(4000);
             log.debug("Servers: {}", client.getServers());
             client.connectToServer(client.getServers().get(1));
+            Thread.sleep(4000);
+            client.requestCharacters();
+            client.requestTracks();
+            client.requestAreas();
             Thread.sleep(400000);
         } catch (Exception ex) {
             log.error("main: ", ex);

@@ -4,7 +4,7 @@ public enum SpriteFlip {
     NOFLIP(0),
     FLIP(1);
 
-    private final int flipNum;
+    public final int flipNum;
 
     SpriteFlip(int flip) {
         flipNum = flip;

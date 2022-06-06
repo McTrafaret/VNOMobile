@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command requests moderator or animator rights.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
