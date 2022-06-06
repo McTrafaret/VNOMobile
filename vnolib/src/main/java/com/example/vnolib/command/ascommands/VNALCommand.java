@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command is sent by master after successful authentication
+ */
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command is used to send OOC messages. Used both by client and server.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

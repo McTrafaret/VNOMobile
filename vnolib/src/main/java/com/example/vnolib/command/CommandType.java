@@ -25,6 +25,7 @@ import com.example.vnolib.command.servercommands.PCCommand;
 import com.example.vnolib.command.servercommands.POPUPCommand;
 import com.example.vnolib.command.servercommands.RADCommand;
 import com.example.vnolib.command.servercommands.RCDCommand;
+import com.example.vnolib.command.servercommands.MDCommand;
 import com.example.vnolib.command.servercommands.RMDCommand;
 import com.example.vnolib.command.servercommands.ROOKCommand;
 import com.example.vnolib.command.servercommands.ReqCommand;
@@ -49,6 +50,7 @@ public enum CommandType {
     RCD(RCDCommand.class),
     CAD(CADCommand.class),
     RMD(RMDCommand.class),
+    MD(MDCommand.class),
     RAD(RADCommand.class),
     AD(ADCommand.class),
     Req(ReqCommand.class),

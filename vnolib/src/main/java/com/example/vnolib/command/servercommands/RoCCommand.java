@@ -7,6 +7,9 @@ import com.example.vnolib.command.CommandArgument;
 
 import lombok.ToString;
 
+/**
+ * This command is sent by server to all clients if someone leaves one location and goes to another.
+ */
 @ToString
 @Command(name = "RoC", numOfArguments = 4)
 public class RoCCommand extends BaseCommand {

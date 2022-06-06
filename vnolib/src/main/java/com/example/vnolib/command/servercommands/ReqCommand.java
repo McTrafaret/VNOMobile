@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command is sent by client to pick a character.
+ */
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

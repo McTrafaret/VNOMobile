@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command is sent to request character with specific ID
+ */
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

@@ -9,6 +9,9 @@ import com.example.vnolib.command.CommandArgument;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This command is sent by master to client in response to {@link RPSCommand}. It gives information about published servers.
+ */
 @Slf4j
 @ToString
 @Command(name = "SDP", numOfArguments = 7)

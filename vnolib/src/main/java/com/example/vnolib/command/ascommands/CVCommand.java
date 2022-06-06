@@ -5,6 +5,9 @@ import com.example.vnolib.command.Command;
 
 import lombok.ToString;
 
+/**
+ * This command is sent by master server after connect
+ */
 @ToString
 @Command(name = "CV")
 public class CVCommand extends BaseCommand {

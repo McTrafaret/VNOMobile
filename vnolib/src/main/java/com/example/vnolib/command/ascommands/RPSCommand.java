@@ -6,6 +6,9 @@ import com.example.vnolib.command.CommandArgument;
 
 import lombok.ToString;
 
+/**
+ * This command is sent by client to master to request the server with specific index
+ */
 @ToString
 @Command(name = "RPS", numOfArguments = 1)
 public class RPSCommand extends BaseCommand {

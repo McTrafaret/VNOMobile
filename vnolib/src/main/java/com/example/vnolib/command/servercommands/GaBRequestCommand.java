@@ -8,6 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+/**
+ * This command requests information about animator with specific ID.
+ *
+ * ID is in fact the line number in animators.txt or something like that
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString

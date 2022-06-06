@@ -4,12 +4,14 @@ import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
 @Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Command(name = "MS", numOfArguments = 10)
 public class MSCommand extends BaseCommand {
