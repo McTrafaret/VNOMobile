@@ -2,6 +2,7 @@ package com.example.vnolib.command;
 
 
 import com.example.vnolib.client.Client;
+import com.example.vnolib.command.servercommands.enums.CommandEnum;
 import com.example.vnolib.exception.CommandException;
 
 import java.lang.reflect.Field;
@@ -53,6 +54,11 @@ public abstract class BaseCommand {
         builder.append(name);
         for (Object arg : args) {
             builder.append("#");
+            if(CommandEnum.class.isAssignableFrom(arg.getClass())) {
+                CommandEnum commandEnum = (CommandEnum) arg;
+                builder.append(commandEnum.asRequestArgument());
+                continue;
+            }
             builder.append(
                     arg.toString()
                     .replace("#", "<pound>")

@@ -3,17 +3,17 @@ package com.example.vnolib.connection;
 import com.example.vnolib.client.model.Server;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.servercommands.ChangeCommand;
-import com.example.vnolib.command.servercommands.LoopingStatus;
+import com.example.vnolib.command.servercommands.enums.LoopingStatus;
 import com.example.vnolib.command.servercommands.MCCommand;
 import com.example.vnolib.command.servercommands.MODCommand;
 import com.example.vnolib.command.servercommands.MSCommand;
-import com.example.vnolib.command.servercommands.MessageColor;
+import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.RADCommand;
 import com.example.vnolib.command.servercommands.RCDCommand;
 import com.example.vnolib.command.servercommands.RMDCommand;
 import com.example.vnolib.command.servercommands.ReqCommand;
-import com.example.vnolib.command.servercommands.SpriteFlip;
-import com.example.vnolib.command.servercommands.SpritePosition;
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
+import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
 import java.util.concurrent.LinkedBlockingQueue;
 

@@ -3,6 +3,9 @@ package com.example.vnolib.command.servercommands;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
+import com.example.vnolib.command.servercommands.enums.MessageColor;
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
+import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
