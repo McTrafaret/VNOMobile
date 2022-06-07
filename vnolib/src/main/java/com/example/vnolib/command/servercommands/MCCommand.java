@@ -3,6 +3,7 @@ package com.example.vnolib.command.servercommands;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
+import com.example.vnolib.command.servercommands.enums.LoopingStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

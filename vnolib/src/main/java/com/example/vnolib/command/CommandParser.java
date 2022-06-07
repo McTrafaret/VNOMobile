@@ -2,6 +2,7 @@ package com.example.vnolib.command;
 
 
 import com.example.vnolib.command.servercommands.CADCommand;
+import com.example.vnolib.command.servercommands.enums.CommandEnum;
 import com.example.vnolib.exception.CommandException;
 
 import java.lang.reflect.Constructor;
@@ -16,6 +17,15 @@ public class CommandParser {
 
     public static final Pattern COMMAND_PATTERN = Pattern.compile("[^#]+#([^#]*#)*%");
 
+    private static <T extends CommandEnum> T fromStringArgToEnum(String arg, Class<T> clazz) {
+        for(T t: clazz.getEnumConstants()) {
+            if(t.asRequestArgument().equals(arg)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
     private static void fillField(Field field, Object object, String value) throws IllegalAccessException {
         field.setAccessible(true);
         if(field.getType().isAssignableFrom(String.class)) {
@@ -26,6 +36,15 @@ public class CommandParser {
         }
         else if(field.getType().isAssignableFrom(int.class)) {
             field.set(object, Integer.parseInt(value));
+        }
+        else if(CommandEnum.class.isAssignableFrom(field.getType())) {
+            for(Object obj : field.getType().getEnumConstants()) {
+                CommandEnum commandEnum = (CommandEnum) obj;
+                if(commandEnum.asRequestArgument().equals(value)) {
+                    field.set(object, field.getClass().cast(commandEnum));
+                    break;
+                }
+            }
         }
         field.setAccessible(false);
     }
