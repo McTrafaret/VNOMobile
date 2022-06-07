@@ -2,16 +2,17 @@ package com.example.vnolib.connection;
 
 import com.example.vnolib.client.model.Server;
 import com.example.vnolib.command.BaseCommand;
+import com.example.vnolib.command.servercommands.ARCCommand;
 import com.example.vnolib.command.servercommands.ChangeCommand;
-import com.example.vnolib.command.servercommands.enums.LoopingStatus;
 import com.example.vnolib.command.servercommands.MCCommand;
 import com.example.vnolib.command.servercommands.MODCommand;
 import com.example.vnolib.command.servercommands.MSCommand;
-import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.RADCommand;
 import com.example.vnolib.command.servercommands.RCDCommand;
 import com.example.vnolib.command.servercommands.RMDCommand;
 import com.example.vnolib.command.servercommands.ReqCommand;
+import com.example.vnolib.command.servercommands.enums.LoopingStatus;
+import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
@@ -98,5 +99,9 @@ public class VNOConnection extends ServerConnection {
                 .characterId(charId)
                 .loopingStatus(loopingStatus)
                 .build());
+    }
+
+    public void sendChangeAreaRequest(int locationId) throws InterruptedException {
+        commandsToSend.put(new ARCCommand(locationId, ""));
     }
 }

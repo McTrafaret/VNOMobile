@@ -17,4 +17,7 @@ public class Area {
 
     String arg5;
 
+    public void setPopulation(int newPopulation) {
+        this.locationPopulation = newPopulation;
+    }
 }

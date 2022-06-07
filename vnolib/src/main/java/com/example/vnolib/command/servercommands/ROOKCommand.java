@@ -1,5 +1,6 @@
 package com.example.vnolib.command.servercommands;
 
+import com.example.vnolib.client.Client;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
@@ -25,4 +26,9 @@ public class ROOKCommand extends BaseCommand {
      */
     @CommandArgument(index = 1, optional = false)
     String arg2;
+
+    @Override
+    public void handle(Client client) {
+        client.changeArea();
+    }
 }
