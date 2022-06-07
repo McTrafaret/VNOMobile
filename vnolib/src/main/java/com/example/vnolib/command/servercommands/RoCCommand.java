@@ -1,6 +1,7 @@
 package com.example.vnolib.command.servercommands;
 
 
+import com.example.vnolib.client.Client;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
@@ -25,4 +26,10 @@ public class RoCCommand extends BaseCommand {
 
     @CommandArgument(index = 3, optional = false)
     int newNumberOfCharactersInJoinLocation;
+
+    @Override
+    public void handle(Client client) {
+        client.changeAreaPopulation(idOfTheLeaveLocation, newNumberOfCharactersInLeaveLocation);
+        client.changeAreaPopulation(idOfTheJoinLocation, newNumberOfCharactersInJoinLocation);
+    }
 }

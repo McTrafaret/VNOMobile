@@ -18,11 +18,15 @@ import com.example.vnolib.exception.ConnectionException;
 import com.example.vnolib.exception.NoSuchCharacterException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,26 +48,38 @@ public class Client {
 
     private boolean commandHandlerRunning = false;
     private final CommandHandler commandHandler;
+    private final CommandPublisher commandPublisher;
     private final LinkedBlockingQueue<BaseCommand> commandsToRead;
 
 
+    private final ReentrantLock areaLock = new ReentrantLock();
     private Area[] areas;
+
+    private final ReentrantLock charactersLock = new ReentrantLock();
     private Character[] characters;
+
+    private final ReentrantLock itemsLock = new ReentrantLock();
     private Item[] items;
+
+    private final ReentrantLock tracksLock = new ReentrantLock();
     private Track[] tracks;
 
     private int serverPlayerLimit;
     private int serverNumberOfPlayers;
 
     private Character currentCharacter = null;
+    private Area currentArea = null;
 
     private boolean isMod = false;
+
+    private Queue<Area> areaChange = new LinkedList<>();
 
     public Client() {
         state = ClientState.LOGIN;
         servers = Collections.synchronizedList(new ArrayList<Server>());
         commandsToRead = new LinkedBlockingQueue<>();
         commandHandler = new CommandHandler(this);
+        commandPublisher = new CommandPublisher();
     }
 
     public List<Server> getServers() {
@@ -110,30 +126,46 @@ public class Client {
         this.currentCharacter = character;
     }
 
-    public synchronized void addArea(Area area) {
-        this.areas[area.getLocationId() - 1] = area;
+    public void addArea(Area area) {
+        synchronized (areaLock) {
+            this.areas[area.getLocationId() - 1] = area;
+        }
     }
 
-    public synchronized void addCharacter(Character character) {
-        this.characters[character.getCharId() - 1] = character;
+    public void changeAreaPopulation(int areaId, int newPopulation) {
+        synchronized (areaLock) {
+            this.areas[areaId - 1].setPopulation(newPopulation);
+        }
+    }
+
+    public void addCharacter(Character character) {
+        synchronized (charactersLock) {
+            this.characters[character.getCharId() - 1] = character;
+        }
     }
 
     // O(n) I don't give a shit, I'm punk
-    public synchronized Character getCharacterByName(String name) throws NoSuchCharacterException {
-        for (Character character : characters) {
-            if(character.getCharName().equals(name)) {
-                return character;
+    public Character getCharacterByName(String name) throws NoSuchCharacterException {
+        synchronized (charactersLock) {
+            for (Character character : characters) {
+                if (character.getCharName().equals(name)) {
+                    return character;
+                }
             }
+            throw new NoSuchCharacterException(String.format("No character with name %s", name));
         }
-        throw new NoSuchCharacterException(String.format("No character with name %s", name));
     }
 
-    public synchronized void addItem(Item item) {
-        this.items[item.getItemId() - 1] = item;
+    public void addItem(Item item) {
+        synchronized (itemsLock) {
+            this.items[item.getItemId() - 1] = item;
+        }
     }
 
-    public synchronized void addTrack(Track track) {
-        this.tracks[track.getTrackId() - 1] = track;
+    public void addTrack(Track track) {
+        synchronized (tracksLock) {
+            this.tracks[track.getTrackId() - 1] = track;
+        }
     }
 
     public void authenticate(String login, String password) throws ConnectionException, NoSuchAlgorithmException, InterruptedException {
@@ -163,7 +195,7 @@ public class Client {
     }
 
     public void requestCharacters() throws InterruptedException {
-        for(int i = 1; i <= characters.length; i++) {
+        for(int i = 1; i <= characters.length; i += 2) {
             vnoConnection.sendCharacterRequest(i);
         }
     }
@@ -202,6 +234,14 @@ public class Client {
         vnoConnection.sendPlayTrackRequest(currentCharacter.getCharName(), track.getTrackName(), track.getTrackId(), currentCharacter.getCharId(), loopingStatus);
     }
 
+    public void requestAreaChange(Area area) throws InterruptedException {
+        vnoConnection.sendChangeAreaRequest(area.getLocationId());
+    }
+
+    public void changeArea() {
+        this.currentArea = areaChange.remove();
+    }
+
     public void addServer(Server server) {
         synchronized (servers) {
             servers.add(server.getIndex(), server);
@@ -229,6 +269,10 @@ public class Client {
         commandHandler.start();
     }
 
+    public void subscribeToCommand(Class<? extends BaseCommand> commandClass, Object object) {
+        commandPublisher.subscribe(commandClass, object);
+    }
+
     private static class CommandHandler extends Thread {
 
         private final Client client;
@@ -241,9 +285,13 @@ public class Client {
         public void run() {
             while(client.commandHandlerRunning) {
                 try {
-                    client.commandsToRead.take().handle(client);
+                    BaseCommand command = client.commandsToRead.take();
+                    command.handle(client);
+                    client.commandPublisher.publish(command);
                 } catch (InterruptedException ex) {
                     log.warn("Interrupted while taking the command to handle");
+                } catch (InvocationTargetException | IllegalAccessException e) {
+                    log.error("When publishing command: ", e);
                 }
             }
         }

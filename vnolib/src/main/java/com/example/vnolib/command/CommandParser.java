@@ -41,7 +41,7 @@ public class CommandParser {
             for(Object obj : field.getType().getEnumConstants()) {
                 CommandEnum commandEnum = (CommandEnum) obj;
                 if(commandEnum.asRequestArgument().equals(value)) {
-                    field.set(object, field.getClass().cast(commandEnum));
+                    field.set(object, field.getType().cast(commandEnum));
                     break;
                 }
             }
@@ -115,7 +115,6 @@ public class CommandParser {
                 } catch (IllegalAccessException e) {
                     log.error("parse: ", e);
                 }
-//                commandArgs.set(commandArgument.index(), field.get(command));
 
                 field.setAccessible(false);
             }
