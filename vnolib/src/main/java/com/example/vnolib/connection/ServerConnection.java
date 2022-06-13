@@ -60,7 +60,7 @@ public abstract class ServerConnection {
         status = ConnectionStatus.DISCONNECTED;
         while(true) {
             try {
-                socketThread._wait();
+                socketThread.join();
                 break;
             } catch (InterruptedException e) {
                 log.warn("Interrupted while stopping the threads");

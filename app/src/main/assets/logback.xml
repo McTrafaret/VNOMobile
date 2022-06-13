@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="Logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <encoder>
+            <Pattern>%date %level %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <appender name="File" class="ch.qos.logback.core.FileAppender">
+        <file>./log/test.log</file>
+        <encoder>
+            <pattern>%date %level %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="Logcat" />
+        <appender-ref ref="File" />
+    </root>
+
+</configuration>
