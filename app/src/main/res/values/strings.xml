@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">VNOMobile</string>
+    <string name="login_hint">Login</string>
+    <string name="password_hint">Password</string>
+    <string name="identify">Identify</string>
+    <string name="create_account">Create account</string>
+    <string name="wrong_credentials">Wrong Credentials</string>
+    <string name="list_of_servers">List of servers</string>
+    <string name="ip_string">IP:</string>
+    <string name="port_string">Port:</string>
 </resources>

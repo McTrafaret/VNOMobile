@@ -33,7 +33,7 @@ public class SocketThread {
         writer.start();
     }
 
-    public void _wait() throws InterruptedException {
+    public void join() throws InterruptedException {
         reader.join();
         writer.join();
     }

@@ -256,6 +256,13 @@ public class Client {
         asConnection.connect();
     }
 
+    public void disconnectFromMaster() throws IOException, ConnectionException {
+        if(asConnection == null) {
+            throw new ConnectionException("Not connected to master");
+        }
+        asConnection.disconnect();
+    }
+
     public void connectToServer(Server server) throws ConnectionException, IOException {
         if(vnoConnection != null) {
             throw new ConnectionException(String.format("Already connected to server. Server info: %s", vnoConnection.getServer()));
@@ -272,6 +279,11 @@ public class Client {
     public void subscribeToCommand(Class<? extends BaseCommand> commandClass, Object object) {
         commandPublisher.subscribe(commandClass, object);
     }
+
+    public void unsubscribeFromCommand(Class<? extends BaseCommand> commandClass, Object object) {
+        commandPublisher.unsubscribe(commandClass, object);
+    }
+
 
     private static class CommandHandler extends Thread {
 
