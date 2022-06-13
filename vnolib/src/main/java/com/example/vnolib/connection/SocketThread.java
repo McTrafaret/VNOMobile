@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SocketThread {
 
+    private static final String SERVER_ENCODING = "cp1251";
+
     private final ServerConnection connection;
 
     private final Thread reader;
@@ -69,7 +71,7 @@ public class SocketThread {
                     if (readReturnValue == '%') {
                         try {
                             byte[] commandBytes = Arrays.copyOfRange(byteBuffer.array(), 0, bytesFilled);
-                            BaseCommand command = CommandParser.parse(new String(commandBytes));
+                            BaseCommand command = CommandParser.parse(new String(commandBytes, SERVER_ENCODING));
                             log.debug(command.toString());
                             connection.getCommandsToRead().put(command);
                         } catch (Exception ex) {
