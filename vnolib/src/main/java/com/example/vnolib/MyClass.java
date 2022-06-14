@@ -14,7 +14,7 @@ public class MyClass {
             client.connectToMaster();
             client.authenticate("Udalny", "***REMOVED***");
             client.requestServers();
-            Thread.sleep(4000);
+            Thread.sleep(10000);
             log.debug("Servers: {}", client.getServers());
             client.connectToServer(client.getServers().get(1));
             Thread.sleep(4000);
