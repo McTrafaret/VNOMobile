@@ -5,6 +5,7 @@ import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.CommandParser;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -42,43 +43,52 @@ public class SocketThread {
 
     private static class ReaderThread extends Thread {
 
+        private static final int BUF_SIZE = 4096;
+
         private final ServerConnection connection;
 
         public ReaderThread(ServerConnection connection) {
             this.connection = connection;
         }
 
+        private static void moveToStart(byte[] content, int offset, int size) {
+            int i = 0;
+            int stopOffset = offset + size;
+            for (int j = offset; j < stopOffset; j++) {
+                content[i] = content[j];
+                i++;
+            }
+        }
+
         @Override
         public void run() {
+            byte[] buffer = new byte[BUF_SIZE];
+            int filled = 0;
             try (InputStream inputStream = connection.getSocket().getInputStream()) {
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-                ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
-                int bytesFilled = 0;
                 while (connection.getStatus().equals(ConnectionStatus.CONNECTED)) {
-                    int readReturnValue;
                     try {
-                        readReturnValue = bufferedReader.read();
-                    } catch (SocketException ex) {
+                        filled += inputStream.read(buffer, filled, BUF_SIZE - filled);
+                    } catch (IOException ex) {
                         log.warn("While reading from socket: ", ex);
                         connection.setStatus(ConnectionStatus.DISCONNECTED);
                         break;
                     }
-                    if (readReturnValue == -1) {
-                        break;
-                    }
-                    byteBuffer.put((byte) readReturnValue);
-                    bytesFilled += 1;
-                    if (readReturnValue == '%') {
-                        try {
-                            byte[] commandBytes = Arrays.copyOfRange(byteBuffer.array(), 0, bytesFilled);
-                            BaseCommand command = CommandParser.parse(new String(commandBytes, SERVER_ENCODING));
-                            log.debug(command.toString());
-                            connection.getCommandsToRead().put(command);
-                        } catch (Exception ex) {
-                            log.error("run: ", ex);
+                    int i = 0;
+                    while (filled > 0 && i < filled) {
+                        if (buffer[i] == '%') {
+                            try {
+                                String commandString = new String(buffer, 0, i + 1, SERVER_ENCODING);
+                                BaseCommand command = CommandParser.parse(commandString);
+                                log.debug(command.toString());
+                                connection.getCommandsToRead().put(command);
+                            } catch (Exception ex) {
+                                log.error("While parsing command: ", ex);
+                            }
+                            filled -= i + 1;
+                            moveToStart(buffer, i + 1, filled);
+                            i = 0;
                         }
-                        byteBuffer.clear();
-                        bytesFilled = 0;
+                        i++;
                     }
                 }
             } catch (Exception ex) {
@@ -97,12 +107,12 @@ public class SocketThread {
 
         @Override
         public void run() {
-            try(OutputStream out = connection.getSocket().getOutputStream()) {
+            try (OutputStream out = connection.getSocket().getOutputStream()) {
                 while (connection.getStatus().equals(ConnectionStatus.CONNECTED)) {
                     try {
                         BaseCommand command = connection.getCommandsToSend().take();
                         try {
-                            out.write(command.toVnoString().getBytes());
+                            out.write(command.toVnoString().getBytes(SERVER_ENCODING));
                         } catch (SocketException ex) {
                             log.warn("While reading from socket: ", ex);
                             connection.setStatus(ConnectionStatus.DISCONNECTED);
