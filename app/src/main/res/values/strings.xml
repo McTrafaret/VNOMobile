@@ -8,4 +8,5 @@
     <string name="list_of_servers">List of servers</string>
     <string name="ip_string">IP:</string>
     <string name="port_string">Port:</string>
+    <string name="pick_client_data_directory">Pick client data directory</string>
 </resources>
