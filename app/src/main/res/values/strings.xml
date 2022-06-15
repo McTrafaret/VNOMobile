@@ -9,4 +9,5 @@
     <string name="ip_string">IP:</string>
     <string name="port_string">Port:</string>
     <string name="pick_client_data_directory">Pick client data directory</string>
+    <string name="path">Path</string>
 </resources>
