@@ -1,4 +1,4 @@
-package com.example.vnomobile;
+package com.example.vnomobile.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnolib.client.model.Server;
-
-import java.nio.charset.StandardCharsets;
+import com.example.vnomobile.ClientHandler;
+import com.example.vnomobile.R;
 
 public class ListOfServersAdapter extends RecyclerView.Adapter<ListOfServersAdapter.ListOfServersViewHolder> {
 

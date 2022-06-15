@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.command.ascommands.SDPCommand;
+import com.example.vnomobile.adapter.ListOfServersAdapter;
 
 import java.util.HashSet;
 import java.util.Set;
