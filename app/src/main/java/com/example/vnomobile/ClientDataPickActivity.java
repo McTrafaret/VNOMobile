@@ -1,13 +1,12 @@
 package com.example.vnomobile;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,10 +16,12 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnomobile.adapter.ListOfDataDirectoriesAdapter;
+import com.example.vnomobile.exception.NotDataDirectoryException;
 import com.example.vnomobile.resource.DataDirectoriesRepository;
 import com.example.vnomobile.util.FileUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -32,7 +33,32 @@ public class ClientDataPickActivity extends AppCompatActivity {
     private RecyclerView listOfDataDirectoriesView;
     private FloatingActionButton addDataDirectoryButton;
 
-    private HashSet<String> dataPaths;
+    // Storage Permissions
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
     private class MyOpenDocumentTree extends ActivityResultContracts.OpenDocumentTree {
         @NonNull
@@ -53,14 +79,14 @@ public class ClientDataPickActivity extends AppCompatActivity {
             new ActivityResultCallback<Uri>() {
                 @Override
                 public void onActivityResult(Uri result) {
-//                    Uri uriTree = DocumentsContract.buildDocumentUriUsingTree(result, DocumentsContract.getTreeDocumentId(result));
-//                    Cursor cursor = getContentResolver().query(uriTree, null, null, null, null);
-//                    cursor.moveToFirst();
-//                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-//                    String path = cursor.getString(nameIndex);
                     String path = getPath(result);
-                    DataDirectoriesRepository.getInstance().add(path);
-                    listOfDataDirectoriesView.getAdapter().notifyDataSetChanged();
+                    try {
+                        DataDirectoriesRepository.getInstance().addDirectory(path);
+                        showToast(String.format("Successfully added directory %s", path));
+                        listOfDataDirectoriesView.getAdapter().notifyDataSetChanged();
+                    } catch (NotDataDirectoryException e) {
+                        showToast(e.getMessage());
+                    }
                 }
             });
 
@@ -78,17 +104,18 @@ public class ClientDataPickActivity extends AppCompatActivity {
         this.listOfDataDirectoriesView.setAdapter(new ListOfDataDirectoriesAdapter());
         this.listOfDataDirectoriesView.setLayoutManager(new LinearLayoutManager(this));
         this.addDataDirectoryButton = findViewById(R.id.add_data_directory_button);
-        dataPaths = new HashSet<>();
+        DataDirectoriesRepository.getInstance().init(this);
         addDataDirectoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mGetDirectory.launch(null);
             }
         });
+        verifyStoragePermissions(this);
     }
 
-    private void directoryAdded(String path) {
-        Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
 }
