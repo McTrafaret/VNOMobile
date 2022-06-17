@@ -114,6 +114,22 @@ public class Client {
         this.tracks = tracks;
     }
 
+    public int getNumOfAreas() {
+        return this.areas.length;
+    }
+
+    public int getNumOfCharacters() {
+        return this.characters.length;
+    }
+
+    public int getNumOfItems() {
+        return this.items.length;
+    }
+
+    public int getNumOfTracks() {
+        return this.tracks.length;
+    }
+
     public void setServerPlayerLimit(int serverPlayerLimit) {
         this.serverPlayerLimit = serverPlayerLimit;
     }

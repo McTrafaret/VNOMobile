@@ -1,14 +1,22 @@
 package com.example.vnomobile.resource;
 
-import java.nio.file.Path;
-
 public class ResourceHandler {
 
-    private final Path dataRootPath;
+    private static ResourceHandler instance;
 
-    public ResourceHandler(Path dataDirectoryPath) {
-        this.dataRootPath = dataDirectoryPath;
+    private DataDirectory directory;
+
+    private ResourceHandler() {
     }
 
+    public static ResourceHandler getInstance() {
+        if(instance == null) {
+            instance = new ResourceHandler();
+        }
+        return instance;
+    }
 
+    public void init(DataDirectory dataDirectory) {
+        this.directory = dataDirectory;
+    }
 }

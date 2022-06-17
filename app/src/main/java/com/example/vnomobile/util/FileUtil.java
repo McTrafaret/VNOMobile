@@ -20,6 +20,43 @@ public final class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
 
+    /**
+     * This thing is needed because the original client was created only for Windows.
+     * Windows treats all files case insensitive, so we have a mess with the directories.
+     *
+     * @param root -- Root directory
+     * @param childPath -- String with relative path to the file
+     * @return actual file with such path case-insensitively or null if not found
+     */
+    public static File getCaseInsensitiveSubFile(File root, String childPath) {
+        File result = new File(root, childPath);
+        if(result.exists()) {
+            return result;
+        }
+
+        String[] subfiles = childPath.split("/");
+
+        result = root;
+        for(String subfile : subfiles) {
+            boolean found = false;
+            if(!result.isDirectory() || result.list() == null) {
+                return null;
+            }
+            for(String filename : result.list()) {
+                if(subfile.equalsIgnoreCase(filename)) {
+                    result = new File(result, filename);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                return null;
+            }
+        }
+
+        return result;
+    }
+
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;
