@@ -27,44 +27,67 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ListOfDataDirectoriesAdapter extends RecyclerView.Adapter<ListOfDataDirectoriesAdapter.ListOfDirectoriesViewHolder> {
 
+    private DataDirectoriesRepository repository;
+    private OnDirectoryListener onDirectoryListener;
+
+    public ListOfDataDirectoriesAdapter(DataDirectoriesRepository repository, OnDirectoryListener listener) {
+        this.repository = repository;
+        this.onDirectoryListener = listener;
+    }
+
     @NonNull
     @Override
     public ListOfDirectoriesViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.list_item_data_directory, parent, false);
-        return new ListOfDirectoriesViewHolder(view);
+        return new ListOfDirectoriesViewHolder(view, onDirectoryListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ListOfDirectoriesViewHolder holder, int position) {
-        holder.bind(DataDirectoriesRepository.getInstance().getDirectory(position));
+        holder.bind(repository.getDirectory(position));
     }
 
     @Override
     public int getItemCount() {
-        return DataDirectoriesRepository.getInstance().getSize();
+        return repository.getSize();
     }
 
-    public class ListOfDirectoriesViewHolder extends RecyclerView.ViewHolder {
+    public class ListOfDirectoriesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private ImageView dataDirectoryIcon;
         private TextView dataDirectoryPath;
+        private TextView clientName;
         private Resources resources;
 
-        public ListOfDirectoriesViewHolder(@NonNull View itemView) {
+        private DataDirectory directory;
+        private OnDirectoryListener listener;
+
+        public ListOfDirectoriesViewHolder(@NonNull View itemView, OnDirectoryListener listener) {
             super(itemView);
             this.resources = itemView.getContext().getResources();
             dataDirectoryIcon = itemView.findViewById(R.id.data_directory_icon);
             dataDirectoryPath = itemView.findViewById(R.id.path_text);
+            clientName = itemView.findViewById(R.id.client_name);
+            this.listener = listener;
+            itemView.setOnClickListener(this);
         }
 
         public void bind(DataDirectory directory) {
+            this.directory = directory;
             Bitmap bitmap = directory.getMobileIcon();
             if(bitmap == null) {
                 bitmap = BitmapFactory.decodeResource(resources, R.drawable.vno_icon);
             }
             dataDirectoryIcon.setImageBitmap(bitmap);
             dataDirectoryPath.setText(directory.getPath());
+            clientName.setText(directory.getName());
+        }
+
+
+        @Override
+        public void onClick(View v) {
+            listener.onDirectoryClick(directory);
         }
     }
 }

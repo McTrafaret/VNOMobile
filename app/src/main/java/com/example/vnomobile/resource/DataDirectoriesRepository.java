@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataDirectoriesRepository {
 
-    private static DataDirectoriesRepository instance;
     private static String CACHE_FILE_NAME = "data_directories.txt";
 
     List<DataDirectory> directories;
@@ -29,21 +28,14 @@ public class DataDirectoriesRepository {
 
     File cacheFile;
 
-    private DataDirectoriesRepository() {
+    public DataDirectoriesRepository(Context context) {
         this.directoriesHashSet = new HashSet<>();
         this.directories = new ArrayList<>();
-    }
-
-    public static DataDirectoriesRepository getInstance() {
-        if(instance == null) {
-            instance = new DataDirectoriesRepository();
-        }
-        return instance;
-    }
-
-    public void init(Context context) {
         File cacheDir = context.getCacheDir();
         cacheFile = new File(cacheDir, CACHE_FILE_NAME);
+    }
+
+    public void loadDataFromCache() {
         parseCacheFile();
     }
 
@@ -111,7 +103,7 @@ public class DataDirectoriesRepository {
         }
         if(!directoriesHashSet.contains(path)) {
             directoriesHashSet.add(path);
-            directories.add(new DataDirectory(path));
+            directories.add(new DataDirectory(directory));
             writeDirectories();
         }
     }

@@ -10,4 +10,7 @@
     <string name="port_string">Port:</string>
     <string name="pick_client_data_directory">Pick client data directory</string>
     <string name="path">Path</string>
+    <string name="client_name">Client name</string>
+    <string name="character_password">Character password</string>
+    <string name="Pick">Pick</string>
 </resources>

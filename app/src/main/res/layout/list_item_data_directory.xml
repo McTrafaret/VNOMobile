@@ -19,11 +19,11 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
-        android:id="@+id/path_label"
+        android:id="@+id/client_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:text="@string/path"
+        android:text="@string/client_name"
         android:textColor="@color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/data_directory_icon"
@@ -43,5 +43,5 @@
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/data_directory_icon"
-        app:layout_constraintTop_toBottomOf="@+id/path_label" />
+        app:layout_constraintTop_toBottomOf="@+id/client_name" />
 </androidx.constraintlayout.widget.ConstraintLayout>

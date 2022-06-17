@@ -21,17 +21,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnomobile.adapter.ListOfDataDirectoriesAdapter;
+import com.example.vnomobile.adapter.OnDirectoryListener;
 import com.example.vnomobile.exception.NotDataDirectoryException;
 import com.example.vnomobile.resource.DataDirectoriesRepository;
+import com.example.vnomobile.resource.DataDirectory;
+import com.example.vnomobile.resource.ResourceHandler;
 import com.example.vnomobile.util.FileUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.HashSet;
 
-public class ClientDataPickActivity extends AppCompatActivity {
+public class ClientDataPickActivity extends AppCompatActivity implements OnDirectoryListener {
 
     private RecyclerView listOfDataDirectoriesView;
     private FloatingActionButton addDataDirectoryButton;
+
+    private DataDirectoriesRepository repository;
 
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -60,6 +65,13 @@ public class ClientDataPickActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onDirectoryClick(DataDirectory directory) {
+        ResourceHandler.getInstance().init(directory);
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+
     private class MyOpenDocumentTree extends ActivityResultContracts.OpenDocumentTree {
         @NonNull
         @Override
@@ -81,7 +93,7 @@ public class ClientDataPickActivity extends AppCompatActivity {
                 public void onActivityResult(Uri result) {
                     String path = getPath(result);
                     try {
-                        DataDirectoriesRepository.getInstance().addDirectory(path);
+                        repository.addDirectory(path);
                         showToast(String.format("Successfully added directory %s", path));
                         listOfDataDirectoriesView.getAdapter().notifyDataSetChanged();
                     } catch (NotDataDirectoryException e) {
@@ -100,11 +112,14 @@ public class ClientDataPickActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client_data_pick);
+
+        this.repository = new DataDirectoriesRepository(this);
+        this.repository.loadDataFromCache();
+
         this.listOfDataDirectoriesView = findViewById(R.id.list_of_data_directories_view);
-        this.listOfDataDirectoriesView.setAdapter(new ListOfDataDirectoriesAdapter());
+        this.listOfDataDirectoriesView.setAdapter(new ListOfDataDirectoriesAdapter(repository, this));
         this.listOfDataDirectoriesView.setLayoutManager(new LinearLayoutManager(this));
         this.addDataDirectoryButton = findViewById(R.id.add_data_directory_button);
-        DataDirectoriesRepository.getInstance().init(this);
         addDataDirectoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
