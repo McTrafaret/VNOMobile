@@ -12,18 +12,23 @@ public class MyClass {
             Client client = new Client();
             client.startCommandHandler();
             client.connectToMaster();
-            client.authenticate("Udalny", "likliklik");
-            client.requestServers();
-            Thread.sleep(10000);
-            log.debug("Servers: {}", client.getServers());
-            client.connectToServer(client.getServers().get(1));
-            Thread.sleep(4000);
-            client.requestCharacters();
-            client.requestTracks();
-            client.requestAreas();
-            Thread.sleep(400000);
+            Thread.sleep(1000);
+            client.disconnectFromMaster();
+            client.stopCommandHandler();
+            log.info("hype");
+//            client.authenticate("Udalny", "likliklik");
+//            client.requestServers();
+//            Thread.sleep(10000);
+//            log.debug("Servers: {}", client.getServers());
+//            client.connectToServer(client.getServers().get(1));
+//            Thread.sleep(4000);
+//            client.requestCharacters();
+//            client.requestTracks();
+//            client.requestAreas();
+//            Thread.sleep(400000);
         } catch (Exception ex) {
             log.error("main: ", ex);
         }
+        log.info("exiting main");
     }
 }

@@ -9,23 +9,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class ASConnection extends ServerConnection {
 
-    public ASConnection(String host, Integer port) {
-        super(host, port);
+    public ASConnection(String host, Integer port, CommandHandler handler) {
+        super(host, port, handler);
     }
 
-    public ASConnection(String host, Integer port, LinkedBlockingQueue<BaseCommand> commandsToReadReference) {
-        super(host, port, commandsToReadReference);
+    public ASConnection(String host, Integer port, LinkedBlockingQueue<BaseCommand> commandsToReadReference, CommandHandler handler) {
+        super(host, port, commandsToReadReference, handler);
     }
 
-    public void sendServersRequest() {
-        //TODO
+    public void sendLoginRequest(String login, String password) throws NoSuchAlgorithmException {
+        sendCommand(new COCommand(login, password));
     }
 
-    public void sendLoginRequest(String login, String password) throws NoSuchAlgorithmException, InterruptedException {
-        commandsToSend.put(new COCommand(login, password));
-    }
-
-    public void sendServerRequest(int index) throws InterruptedException {
-        commandsToSend.put(new RPSCommand(index));
+    public void sendServerRequest(int index) {
+        sendCommand(new RPSCommand(index));
     }
 }

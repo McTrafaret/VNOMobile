@@ -41,6 +41,12 @@ public class SocketThread {
         writer.join();
     }
 
+    public void notifyWriter() {
+        synchronized (writer) {
+            writer.notify();
+        }
+    }
+
     private static class ReaderThread extends Thread {
 
         private static final int BUF_SIZE = 4096;
@@ -81,6 +87,7 @@ public class SocketThread {
                                 BaseCommand command = CommandParser.parse(commandString);
                                 log.debug(command.toString());
                                 connection.getCommandsToRead().put(command);
+                                connection.notifyAboutNewCommand();
                             } catch (Exception ex) {
                                 log.error("While parsing command: ", ex);
                             }
@@ -109,14 +116,22 @@ public class SocketThread {
         public void run() {
             try (OutputStream out = connection.getSocket().getOutputStream()) {
                 while (connection.getStatus().equals(ConnectionStatus.CONNECTED)) {
+                    synchronized (this) {
+                        wait();
+                    }
                     try {
-                        BaseCommand command = connection.getCommandsToSend().take();
-                        try {
-                            out.write(command.toVnoString().getBytes(SERVER_ENCODING));
-                        } catch (SocketException ex) {
-                            log.warn("While reading from socket: ", ex);
-                            connection.setStatus(ConnectionStatus.DISCONNECTED);
-                            break;
+                        while(true) {
+                            BaseCommand command = connection.getCommandsToSend().poll();
+                            if (command == null) {
+                                break;
+                            }
+                            try {
+                                out.write(command.toVnoString().getBytes(SERVER_ENCODING));
+                            } catch (SocketException ex) {
+                                log.warn("While reading from socket: ", ex);
+                                connection.setStatus(ConnectionStatus.DISCONNECTED);
+                                break;
+                            }
                         }
                     } catch (Exception ex) {
                         log.error("run: ", ex);

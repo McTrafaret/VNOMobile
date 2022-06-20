@@ -37,29 +37,36 @@ public class LoadingActivity extends AppCompatActivity {
     private Client client;
 
     private void advanceProgress() {
-        int percentage = loaded.get() * 100 / fullUnitsOfInformation;
-        percentageInfo.setText(String.format("%s%%", percentage));
-        progressBar.setProgress(percentage);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int percentage = loaded.get() * 100 / fullUnitsOfInformation;
+                percentageInfo.setText(String.format("%s%%", percentage));
+                progressBar.setProgress(percentage);
+            }
+        });
+    }
+
+    private void changeText(String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                loadingText.setText(text);
+            }
+        });
     }
 
     @OnCommand(CADCommand.class)
     private void onGetCharacter(CADCommand command) {
-        loaded.incrementAndGet();
-        int numOfLoadedChars = loadedCharacters.incrementAndGet();
+        loaded.addAndGet(command.getInfo().size());
+        int numOfLoadedChars = loadedCharacters.addAndGet(command.getInfo().size());
 
         advanceProgress();
 
         if(client.getNumOfCharacters() == numOfLoadedChars) {
             client.unsubscribeFromCommand(CADCommand.class, this);
-            loadingText.setText("Loading music...");
-            while(true) {
-                try {
-                    client.requestTracks();
-                    break;
-                } catch (InterruptedException e) {
-                    log.warn("Interrupted while requesting tracks");
-                }
-            }
+            changeText("Loading music...");
+            client.requestTracks();
         }
     }
 
@@ -72,15 +79,8 @@ public class LoadingActivity extends AppCompatActivity {
 
         if(client.getNumOfTracks() == numOfLoadedTracks) {
             client.unsubscribeFromCommand(MDCommand.class, this);
-            loadingText.setText("Loading areas...");
-            while(true) {
-                try {
-                    client.requestAreas();
-                    break;
-                } catch (InterruptedException e) {
-                    log.warn("Interrupted while requesting areas");
-                }
-            }
+            changeText("Loading areas...");
+            client.requestAreas();
         }
 
     }
@@ -94,8 +94,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         if(client.getNumOfAreas() == numOfLoadedAreas) {
             client.unsubscribeFromCommand(ADCommand.class, this);
-            progressBar.setProgress(100);
-            loadingText.setText("Done!");
+            changeText("Done!");
             Intent intent = new Intent(this, CharacterPickActivity.class);
             startActivity(intent);
         }
@@ -123,15 +122,8 @@ public class LoadingActivity extends AppCompatActivity {
         this.loadedAreas = new AtomicInteger(0);
         this.loadedTracks = new AtomicInteger(0);
 
-        while(true) {
-            try {
-                client.requestCharacters();
-                break;
-            } catch (InterruptedException e) {
-                log.warn("Interrupted while requesting characters");
-            }
-        }
-
-        loadingText.setText("Loading characters...");
+        log.debug("Num of tracks: {}", client.getNumOfTracks());
+        client.requestCharacters();
+        changeText("Loading characters...");
     }
 }

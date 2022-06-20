@@ -22,26 +22,26 @@ public class VNOConnection extends ServerConnection {
 
     private final Server server;
 
-    public VNOConnection(Server server) {
-        super(server.getIp(), server.getPort());
+    public VNOConnection(Server server, CommandHandler handler) {
+        super(server.getIp(), server.getPort(), handler);
         this.server = server;
     }
 
-    public VNOConnection(Server server, LinkedBlockingQueue<BaseCommand> commandsToReadReference) {
-        super(server.getIp(), server.getPort(), commandsToReadReference);
+    public VNOConnection(Server server, LinkedBlockingQueue<BaseCommand> commandsToReadReference, CommandHandler handler) {
+        super(server.getIp(), server.getPort(), commandsToReadReference, handler);
         this.server = server;
     }
 
-    public VNOConnection(String host, Integer port) {
-        super(host, port);
+    public VNOConnection(String host, Integer port, CommandHandler handler) {
+        super(host, port, handler);
         this.server = Server.builder()
                 .ip(host)
                 .port(port)
                 .build();
     }
 
-    public VNOConnection(String host, Integer port, LinkedBlockingQueue<BaseCommand> commandsToReadReference) {
-        super(host, port, commandsToReadReference);
+    public VNOConnection(String host, Integer port, LinkedBlockingQueue<BaseCommand> commandsToReadReference, CommandHandler handler) {
+        super(host, port, commandsToReadReference, handler);
         this.server = Server.builder()
                 .ip(host)
                 .port(port)
@@ -52,32 +52,32 @@ public class VNOConnection extends ServerConnection {
         return server;
     }
 
-    public void requestMod(String modPassword) throws InterruptedException {
-        commandsToSend.put(new MODCommand(modPassword));
+    public void requestMod(String modPassword) {
+        sendCommand(new MODCommand(modPassword));
     }
 
-    public void sendAreaRequest(int areaId) throws InterruptedException {
-        commandsToSend.put(new RADCommand(areaId));
+    public void sendAreaRequest(int areaId) {
+        sendCommand(new RADCommand(areaId));
     }
 
-    public void sendCharacterRequest(int characterId) throws InterruptedException {
-        commandsToSend.put(new RCDCommand(characterId));
+    public void sendCharacterRequest(int characterId) {
+        sendCommand(new RCDCommand(characterId));
     }
 
-    public void sendTrackRequest(int trackId) throws InterruptedException {
-        commandsToSend.put(new RMDCommand(trackId));
+    public void sendTrackRequest(int trackId) {
+        sendCommand(new RMDCommand(trackId));
     }
 
-    public void sendPickCharacterRequest(int charId, String password) throws InterruptedException {
-        commandsToSend.put(new ReqCommand(charId, password));
+    public void sendPickCharacterRequest(int charId, String password) {
+        sendCommand(new ReqCommand(charId, password));
     }
 
-    public void sendChangeRequest() throws InterruptedException {
-        commandsToSend.put(new ChangeCommand());
+    public void sendChangeRequest() {
+        sendCommand(new ChangeCommand());
     }
 
-    public void sendICMessage(String charName, String spriteName, String message, String boxNameString, MessageColor color, int charId, String backgroundImageName, SpritePosition position, SpriteFlip flip, String sfx) throws InterruptedException {
-        commandsToSend.put(MSCommand.builder()
+    public void sendICMessage(String charName, String spriteName, String message, String boxNameString, MessageColor color, int charId, String backgroundImageName, SpritePosition position, SpriteFlip flip, String sfx) {
+        sendCommand(MSCommand.builder()
                 .characterName(charName)
                 .spriteName(spriteName)
                 .message(message)
@@ -91,8 +91,8 @@ public class VNOConnection extends ServerConnection {
                 .build());
     }
 
-    public void sendPlayTrackRequest(String charName, String trackName, int trackId, int charId, LoopingStatus loopingStatus) throws InterruptedException {
-        commandsToSend.put(MCCommand.builder()
+    public void sendPlayTrackRequest(String charName, String trackName, int trackId, int charId, LoopingStatus loopingStatus) {
+        sendCommand(MCCommand.builder()
                 .characterName(charName)
                 .trackName(trackName)
                 .trackId(trackId)
@@ -101,7 +101,7 @@ public class VNOConnection extends ServerConnection {
                 .build());
     }
 
-    public void sendChangeAreaRequest(int locationId) throws InterruptedException {
-        commandsToSend.put(new ARCCommand(locationId, ""));
+    public void sendChangeAreaRequest(int locationId) {
+        sendCommand(new ARCCommand(locationId, ""));
     }
 }
