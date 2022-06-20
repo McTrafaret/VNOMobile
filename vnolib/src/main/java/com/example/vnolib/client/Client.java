@@ -13,12 +13,12 @@ import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnolib.connection.ASConnection;
 import com.example.vnolib.connection.ConnectionStatus;
+import com.example.vnolib.connection.PublisherCommandHandler;
 import com.example.vnolib.connection.VNOConnection;
 import com.example.vnolib.exception.ConnectionException;
 import com.example.vnolib.exception.NoSuchCharacterException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,8 +47,7 @@ public class Client {
     private final List<Server> servers;
 
     private boolean commandHandlerRunning = false;
-    private final CommandHandler commandHandler;
-    private final CommandPublisher commandPublisher;
+    private final PublisherCommandHandler commandHandler;
     private final LinkedBlockingQueue<BaseCommand> commandsToRead;
 
 
@@ -78,8 +77,7 @@ public class Client {
         state = ClientState.LOGIN;
         servers = Collections.synchronizedList(new ArrayList<Server>());
         commandsToRead = new LinkedBlockingQueue<>();
-        commandHandler = new CommandHandler(this);
-        commandPublisher = new CommandPublisher();
+        commandHandler = new PublisherCommandHandler(commandsToRead, this);
     }
 
     public List<Server> getServers() {
@@ -184,7 +182,7 @@ public class Client {
         }
     }
 
-    public void authenticate(String login, String password) throws ConnectionException, NoSuchAlgorithmException, InterruptedException {
+    public void authenticate(String login, String password) throws ConnectionException, NoSuchAlgorithmException {
         if(!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
             // TODO Exception
             throw new ConnectionException("Not connected to master");
@@ -192,7 +190,7 @@ public class Client {
         asConnection.sendLoginRequest(login, password);
     }
 
-    public void requestServer(int index) throws ConnectionException, InterruptedException {
+    public void requestServer(int index) throws ConnectionException {
         if(!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
             // TODO Exception
             throw new ConnectionException("Not connected to master");
@@ -200,33 +198,33 @@ public class Client {
         asConnection.sendServerRequest(index);
     }
 
-    public void requestServers() throws InterruptedException, ConnectionException {
+    public void requestServers() throws ConnectionException {
         requestServer(0);
     }
 
-    public void requestAreas() throws InterruptedException {
+    public void requestAreas() {
         for(int i = 1; i <= areas.length; i++) {
             vnoConnection.sendAreaRequest(i);
         }
     }
 
-    public void requestCharacters() throws InterruptedException {
+    public void requestCharacters() {
         for(int i = 1; i <= characters.length; i += 2) {
             vnoConnection.sendCharacterRequest(i);
         }
     }
 
-    public void requestTracks() throws InterruptedException {
-        for(int i = 1; i <= characters.length; i++) {
+    public void requestTracks() {
+        for(int i = 1; i <= tracks.length; i++) {
             vnoConnection.sendTrackRequest(i);
         }
     }
 
-    public void requestItems() throws InterruptedException {
+    public void requestItems() {
         // TODO: vpadlu razbiratsya s itemami, ih nikto ne yuzaet
     }
 
-    public void pickCharacter(Character character, String password) throws InterruptedException {
+    public void pickCharacter(Character character, String password) {
         if(currentCharacter != null) {
             vnoConnection.sendChangeRequest();
         }
@@ -240,17 +238,17 @@ public class Client {
                          String backgroundImageName,
                          SpritePosition position,
                          SpriteFlip flip,
-                         String sfx) throws InterruptedException {
+                         String sfx) {
 
         String boxNameString = boxName.equals(BoxName.USERNAME) ? username : boxName.getRequestString();
         vnoConnection.sendICMessage(currentCharacter.getCharName(), spriteName, message, boxNameString, color, currentCharacter.getCharId(), backgroundImageName, position, flip, sfx);
     }
 
-    public void playTrack(Track track, LoopingStatus loopingStatus) throws InterruptedException {
+    public void playTrack(Track track, LoopingStatus loopingStatus) {
         vnoConnection.sendPlayTrackRequest(currentCharacter.getCharName(), track.getTrackName(), track.getTrackId(), currentCharacter.getCharId(), loopingStatus);
     }
 
-    public void requestAreaChange(Area area) throws InterruptedException {
+    public void requestAreaChange(Area area) {
         vnoConnection.sendChangeAreaRequest(area.getLocationId());
     }
 
@@ -268,7 +266,7 @@ public class Client {
         if(asConnection != null) {
             throw new ConnectionException(String.format("Already connected to master. Ip: %s", asConnection.getHost()));
         }
-        asConnection = new ASConnection(MASTER_IP, MASTER_PORT, commandsToRead);
+        asConnection = new ASConnection(MASTER_IP, MASTER_PORT, commandsToRead, commandHandler);
         asConnection.connect();
     }
 
@@ -283,49 +281,27 @@ public class Client {
         if(vnoConnection != null) {
             throw new ConnectionException(String.format("Already connected to server. Server info: %s", vnoConnection.getServer()));
         }
-        vnoConnection = new VNOConnection(server, commandsToRead);
+        vnoConnection = new VNOConnection(server, commandsToRead, commandHandler);
         vnoConnection.connect();
     }
 
     public void startCommandHandler() {
-        commandHandlerRunning = true;
         commandHandler.start();
     }
 
+    public void stopCommandHandler() {
+        commandHandler.stopHandler();
+    }
+
     public void subscribeToCommand(Class<? extends BaseCommand> commandClass, Object object) {
-        commandPublisher.subscribe(commandClass, object);
+        commandHandler.subscribeToCommand(commandClass, object);
     }
 
     public void unsubscribeFromCommand(Class<? extends BaseCommand> commandClass, Object object) {
-        commandPublisher.unsubscribe(commandClass, object);
+        commandHandler.unsubscribeFromCommand(commandClass, object);
     }
 
-
-    private static class CommandHandler extends Thread {
-
-        private final Client client;
-
-        public CommandHandler(Client client) {
-            this.client = client;
-        }
-
-        @Override
-        public void run() {
-            while(client.commandHandlerRunning) {
-                try {
-                    BaseCommand command = client.commandsToRead.take();
-                    command.handle(client);
-                    client.commandPublisher.publish(command);
-                } catch (InterruptedException ex) {
-                    log.warn("Interrupted while taking the command to handle");
-                } catch (InvocationTargetException | IllegalAccessException e) {
-                    log.error("When publishing command: ", e);
-                }
-            }
-        }
-    }
-
-    public void getMod(String modPassword) throws ConnectionException, InterruptedException {
+    public void getMod(String modPassword) throws ConnectionException {
         if(vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
             throw new ConnectionException("Not connected to server");
         }
