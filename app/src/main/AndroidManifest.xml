@@ -19,6 +19,9 @@
         android:theme="@style/Theme.VNOMobile"
         tools:targetApi="31">
         <activity
+            android:name=".MainScreenActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoadingActivity"
             android:exported="false" />
         <activity

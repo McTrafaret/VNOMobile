@@ -19,4 +19,8 @@ public class ResourceHandler {
     public void init(DataDirectory dataDirectory) {
         this.directory = dataDirectory;
     }
+
+    public DataDirectory getDirectory() {
+        return directory;
+    }
 }
