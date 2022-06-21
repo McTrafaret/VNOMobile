@@ -4,12 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
     tools:context=".CharacterPickActivity">
+
+    <TextView
+        android:id="@+id/character_name_text_view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/bigArt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/bigArt"
         android:layout_width="0dp"
-        android:layout_height="480dp"
+        android:layout_height="420dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="10dp"
         android:scaleType="fitXY"
@@ -23,12 +38,16 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="10dp"
+        android:columnWidth="50dp"
+        android:horizontalSpacing="10dp"
+        android:numColumns="auto_fit"
+        android:verticalSpacing="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/character_password_field"
         app:layout_constraintEnd_toStartOf="@+id/bigArt"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/character_name_text_view" />
 
     <EditText
         android:id="@+id/character_password_field"
@@ -48,9 +67,11 @@
     <Button
         android:id="@+id/pick_character_button"
         android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="10dp"
         android:text="@string/Pick"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/bigArt"
         app:layout_constraintStart_toStartOf="@+id/character_pick_grid"
         app:layout_constraintTop_toBottomOf="@+id/character_pick_grid" />

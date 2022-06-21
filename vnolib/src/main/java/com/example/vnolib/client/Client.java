@@ -158,6 +158,12 @@ public class Client {
         }
     }
 
+    public Character getCharacterByIndex(int index) {
+        synchronized (charactersLock) {
+            return characters[index];
+        }
+    }
+
     // O(n) I don't give a shit, I'm punk
     public Character getCharacterByName(String name) throws NoSuchCharacterException {
         synchronized (charactersLock) {
@@ -227,6 +233,7 @@ public class Client {
     public void pickCharacter(Character character, String password) {
         if(currentCharacter != null) {
             vnoConnection.sendChangeRequest();
+            currentCharacter = null;
         }
         vnoConnection.sendPickCharacterRequest(character.getCharId(), password);
     }

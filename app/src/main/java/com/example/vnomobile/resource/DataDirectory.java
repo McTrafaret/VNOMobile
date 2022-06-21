@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DataDirectory {
 
     private final String name;
@@ -38,7 +41,7 @@ public class DataDirectory {
     }
 
     public List<RosterImage> getRosterImages() throws ResourceNotFoundException {
-        File rosterImageDirectory = new File(directoryFile, "data/misc/RosterImage");
+        File rosterImageDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/misc/RosterImage");
         if(!rosterImageDirectory.exists() || !rosterImageDirectory.isDirectory()) {
             throw new ResourceNotFoundException("data/misc/RosterImage directory not found");
         }
@@ -64,6 +67,24 @@ public class DataDirectory {
         }
 
         return rosterImages;
+    }
+
+    public Bitmap getBigArt(String characterName) throws ResourceNotFoundException {
+        File bigArtDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/misc/BigArt");
+        if(!bigArtDirectory.exists() || !bigArtDirectory.isDirectory()) {
+            throw new ResourceNotFoundException("data/misc/BigArt directory not found");
+        }
+        String[] bigArtFileNames = bigArtDirectory.list();
+        if(bigArtFileNames == null) {
+            return null;
+        }
+        for(String filename : bigArtDirectory.list())  {
+            if(filename.toUpperCase().startsWith(characterName.toUpperCase())) {
+                return BitmapFactory.decodeFile(bigArtDirectory.getPath() + File.separator + filename);
+            }
+        }
+
+        return null;
     }
 
     public String getName() {
