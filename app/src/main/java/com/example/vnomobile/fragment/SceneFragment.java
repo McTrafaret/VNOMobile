@@ -1,60 +1,78 @@
 package com.example.vnomobile.fragment;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 
+import com.example.vnolib.client.Client;
+import com.example.vnolib.client.model.BoxName;
+import com.example.vnolib.client.model.CharacterState;
+import com.example.vnolib.command.servercommands.enums.MessageColor;
+import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
+import com.example.vnomobile.util.UIUtil;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SceneFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SceneFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private SurfaceView sceneView;
+    private EditText messageInput;
+    private Button sendButton;
+    private RecyclerView listOfCharacterButtons;
+    private SeekBar colorsSlider;
+    private Spinner backgroundSelectSpinner;
+    private Spinner iniSelectSpinner;
+    private Spinner sfxSelectSpinner;
+    private ImageButton positionButton;
+    private ImageButton flipButton;
+    private ImageButton sfxButton;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Client client;
+    private CharacterState state;
+
+    private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            Drawable color = UIUtil.getColor(seekBar.getContext(), MessageColor.fromInt(progress));
+            seekBar.setProgressDrawable(color);
+//            seekBar.setThumb(color);
+
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
 
     public SceneFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SceneFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SceneFragment newInstance(String param1, String param2) {
-        SceneFragment fragment = new SceneFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        this.client = ClientHandler.getClient();
+        this.state = new CharacterState();
     }
 
     @Override
@@ -62,5 +80,37 @@ public class SceneFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_scene, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.sceneView = view.findViewById(R.id.scene_view);
+        this.messageInput = view.findViewById(R.id.character_message_input);
+
+
+        this.sendButton = view.findViewById(R.id.send_character_message_button);
+
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String message = messageInput.getText().toString();
+                client.sendICMessage(state, message);
+            }
+        });
+
+        this.listOfCharacterButtons = view.findViewById(R.id.list_of_character_buttons);
+
+        this.colorsSlider = view.findViewById(R.id.colors_slider);
+        colorsSlider.setMax(6);
+        colorsSlider.setProgress(0);
+        colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener());
+
+        this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
+        this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
+        this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
+        this.positionButton = view.findViewById(R.id.position_button);
+        this.flipButton = view.findViewById(R.id.flip_button);
+        this.sfxButton = view.findViewById(R.id.sfx_button);
     }
 }
