@@ -6,5 +6,11 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="messageWhite">#FFFFFFFF</color>
+    <color name="messageBlue">#03A9F4</color>
+    <color name="messagePink">#FF5DA3</color>
+    <color name="messageYellow">#FFEB3B</color>
+    <color name="messageGreen">#00FF0A</color>
+    <color name="messageOrange">#FF5722</color>
+    <color name="messageRed">#FF0000</color>
 </resources>

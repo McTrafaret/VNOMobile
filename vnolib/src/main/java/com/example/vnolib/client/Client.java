@@ -3,6 +3,7 @@ package com.example.vnolib.client;
 import com.example.vnolib.client.model.Area;
 import com.example.vnolib.client.model.BoxName;
 import com.example.vnolib.client.model.Character;
+import com.example.vnolib.client.model.CharacterState;
 import com.example.vnolib.client.model.Item;
 import com.example.vnolib.client.model.Server;
 import com.example.vnolib.client.model.Track;
@@ -249,6 +250,19 @@ public class Client {
 
         String boxNameString = boxName.equals(BoxName.USERNAME) ? username : boxName.getRequestString();
         vnoConnection.sendICMessage(currentCharacter.getCharName(), spriteName, message, boxNameString, color, currentCharacter.getCharId(), backgroundImageName, position, flip, sfx);
+    }
+
+    public void sendICMessage(CharacterState state, String message) {
+
+        BoxName boxName = state.getBoxName();
+        String spriteName = state.getSpriteName();
+        MessageColor color = state.getMessageColor();
+        String backgroundImageName = state.getBackgroundName();
+        SpritePosition position = state.getPosition();
+        SpriteFlip flip = state.getFlip();
+        String sfx = state.getSfx();
+
+        sendICMessage(boxName, spriteName, message, color, backgroundImageName, position, flip, sfx);
     }
 
     public void playTrack(Track track, LoopingStatus loopingStatus) {

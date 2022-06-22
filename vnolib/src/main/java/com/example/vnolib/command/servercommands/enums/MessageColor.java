@@ -15,6 +15,15 @@ public enum MessageColor implements CommandEnum {
         colorIndex = index;
     }
 
+    public static MessageColor fromInt(int a) {
+        for(MessageColor value : MessageColor.values()) {
+            if (value.colorIndex == a) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String asRequestArgument() {
         return Integer.toString(colorIndex);
