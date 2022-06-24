@@ -24,6 +24,14 @@ public class UIUtil {
     }
 
     public static Drawable getColor(Context context, MessageColor color) {
-        return AppCompatResources.getDrawable(context, colorEnumToResIdMap.get(color));
+        Integer colorId = colorEnumToResIdMap.get(color);
+        if(colorId == null) {
+            return null;
+        }
+        return AppCompatResources.getDrawable(context, colorId);
+    }
+
+    public static int getColorId(MessageColor color) {
+        return colorEnumToResIdMap.get(color);
     }
 }

@@ -54,6 +54,10 @@ public abstract class BaseCommand {
         builder.append(name);
         for (Object arg : args) {
             builder.append("#");
+            if(arg == null) {
+                builder.append("");
+                continue;
+            }
             if(CommandEnum.class.isAssignableFrom(arg.getClass())) {
                 CommandEnum commandEnum = (CommandEnum) arg;
                 builder.append(commandEnum.asRequestArgument());

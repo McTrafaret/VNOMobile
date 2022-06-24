@@ -3,10 +3,12 @@ package com.example.vnomobile.resource;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import com.example.vnolib.client.model.Character;
 import com.example.vnomobile.exception.ResourceNotFoundException;
 import com.example.vnomobile.util.FileUtil;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +71,7 @@ public class DataDirectory {
         return rosterImages;
     }
 
-    public Bitmap getBigArt(String characterName) throws ResourceNotFoundException {
+    public Bitmap getBigArt(Character character) throws ResourceNotFoundException {
         File bigArtDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/misc/BigArt");
         if(!bigArtDirectory.exists() || !bigArtDirectory.isDirectory()) {
             throw new ResourceNotFoundException("data/misc/BigArt directory not found");
@@ -78,9 +80,27 @@ public class DataDirectory {
         if(bigArtFileNames == null) {
             return null;
         }
-        for(String filename : bigArtDirectory.list())  {
-            if(filename.toUpperCase().startsWith(characterName.toUpperCase())) {
+        for(String filename : bigArtFileNames)  {
+            if(filename.toUpperCase().startsWith(character.getCharName().toUpperCase())) {
                 return BitmapFactory.decodeFile(bigArtDirectory.getPath() + File.separator + filename);
+            }
+        }
+
+        return null;
+    }
+
+    public CharacterData getCharacterData(Character character) throws ResourceNotFoundException, IOException {
+        File charactersDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/characters");
+        if(!charactersDirectory.exists() || charactersDirectory.isDirectory()) {
+            throw new ResourceNotFoundException("data/characters directory not found");
+        }
+        String[] charactersFileNames = charactersDirectory.list();
+        if(charactersFileNames == null) {
+            return null;
+        }
+        for(String filename : charactersFileNames) {
+            if(filename.toUpperCase().startsWith(character.getCharName().toUpperCase())) {
+                return new CharacterData(new File(charactersDirectory.getPath() + File.separator + filename));
             }
         }
 

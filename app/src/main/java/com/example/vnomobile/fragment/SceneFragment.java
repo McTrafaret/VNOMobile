@@ -1,10 +1,17 @@
 package com.example.vnomobile.fragment;
 
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.BlendModeColorFilterCompat;
+import androidx.core.graphics.BlendModeCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,12 +52,23 @@ public class SceneFragment extends Fragment {
 
     private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
 
+        CharacterState state;
+
+        public ColorSliderListener(CharacterState state) {
+            this.state = state;
+        }
+
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            Drawable color = UIUtil.getColor(seekBar.getContext(), MessageColor.fromInt(progress));
-            seekBar.setProgressDrawable(color);
-//            seekBar.setThumb(color);
-
+            int colorId = UIUtil.getColorId(MessageColor.fromInt(progress));
+            int color = seekBar.getResources().getColor(colorId);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                seekBar.getThumb().setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
+            }
+            else {
+                seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            }
+            state.setMessageColor(MessageColor.fromInt(progress));
         }
 
         @Override
@@ -73,6 +91,9 @@ public class SceneFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.client = ClientHandler.getClient();
         this.state = new CharacterState();
+
+        state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
+        state.setSpriteName("1"); // TODO: take values from characters directory
     }
 
     @Override
@@ -104,7 +125,7 @@ public class SceneFragment extends Fragment {
         this.colorsSlider = view.findViewById(R.id.colors_slider);
         colorsSlider.setMax(6);
         colorsSlider.setProgress(0);
-        colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener());
+        colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener(state));
 
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
         this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
