@@ -76,7 +76,7 @@ public class CharacterPickActivity extends AppCompatActivity {
                 selectedCharacter = client.getCharacterByIndex(position);
                 Bitmap bigArt = null;
                 try {
-                    bigArt = dataDirectory.getBigArt(selectedCharacter.getCharName());
+                    bigArt = dataDirectory.getBigArt(selectedCharacter);
                 } catch (ResourceNotFoundException e) {
                     log.warn("Trying to get BigArt: {}", e);
                 }

@@ -141,9 +141,23 @@ public class Client {
         this.currentCharacter = character;
     }
 
+    public Area getCurrentArea() {
+        return currentArea;
+    }
+
+    public void setCurrentArea(Area area) {
+        currentArea = area;
+    }
+
     public void addArea(Area area) {
         synchronized (areaLock) {
             this.areas[area.getLocationId() - 1] = area;
+        }
+    }
+
+    public Area getAreaById(int id) {
+        synchronized (areaLock) {
+            return areas[id-1];
         }
     }
 

@@ -23,6 +23,9 @@ public class AllowedCommand extends BaseCommand {
     public void handle(Client client) {
         try {
             client.setCurrentCharacter(client.getCharacterByName(characterName));
+            if(client.getCurrentArea() == null) {
+                client.setCurrentArea(client.getAreaById(1));
+            }
         } catch (Exception ex) {
             log.error("Failed to set character: ", ex);
         }
