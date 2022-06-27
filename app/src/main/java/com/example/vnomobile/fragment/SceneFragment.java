@@ -1,5 +1,6 @@
 package com.example.vnomobile.fragment;
 
+import android.content.Context;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
 import android.graphics.ColorFilter;
@@ -19,11 +20,13 @@ import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.model.BoxName;
@@ -31,8 +34,19 @@ import com.example.vnolib.client.model.CharacterState;
 import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
+import com.example.vnomobile.exception.ResourceNotFoundException;
+import com.example.vnomobile.resource.CharacterData;
+import com.example.vnomobile.resource.CharacterIni;
+import com.example.vnomobile.resource.DataDirectory;
+import com.example.vnomobile.resource.ResourceHandler;
 import com.example.vnomobile.util.UIUtil;
 
+import java.io.File;
+import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class SceneFragment extends Fragment {
 
     private SurfaceView sceneView;
@@ -48,7 +62,11 @@ public class SceneFragment extends Fragment {
     private ImageButton sfxButton;
 
     private Client client;
+    private DataDirectory dataDirectory;
     private CharacterState state;
+
+    private CharacterData characterData;
+    private CharacterIni currentIniFile;
 
     private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
 
@@ -82,6 +100,27 @@ public class SceneFragment extends Fragment {
         }
     }
 
+    private static class FileArrayAdapter extends ArrayAdapter<File> {
+
+        public FileArrayAdapter(@NonNull Context context, int resource, @NonNull File[] objects) {
+            super(context, resource, objects);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            File file = getItem(position);
+
+            if(convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, null);
+            }
+            TextView textView = convertView.findViewById(android.R.id.text1);
+            textView.setText(file.getName());
+            return textView;
+        }
+
+    }
+
     public SceneFragment() {
         // Required empty public constructor
     }
@@ -91,6 +130,12 @@ public class SceneFragment extends Fragment {
         super.onCreate(savedInstanceState);
         this.client = ClientHandler.getClient();
         this.state = new CharacterState();
+        this.dataDirectory = ResourceHandler.getInstance().getDirectory();
+        try {
+            this.characterData = dataDirectory.getCharacterData(client.getCurrentCharacter());
+        } catch (Exception ex) {
+            log.error("OnCreate: ", ex);
+        }
 
         state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
         state.setSpriteName("1"); // TODO: take values from characters directory
@@ -128,7 +173,12 @@ public class SceneFragment extends Fragment {
         colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener(state));
 
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
+
         this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
+        FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, characterData.getIniFiles());
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        iniSelectSpinner.setAdapter(adapter);
+
         this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
         this.positionButton = view.findViewById(R.id.position_button);
         this.flipButton = view.findViewById(R.id.flip_button);
