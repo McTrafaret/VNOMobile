@@ -91,7 +91,7 @@ public class DataDirectory {
 
     public CharacterData getCharacterData(Character character) throws ResourceNotFoundException, IOException {
         File charactersDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/characters");
-        if(!charactersDirectory.exists() || charactersDirectory.isDirectory()) {
+        if(!charactersDirectory.exists() || !charactersDirectory.isDirectory()) {
             throw new ResourceNotFoundException("data/characters directory not found");
         }
         String[] charactersFileNames = charactersDirectory.list();
@@ -113,5 +113,19 @@ public class DataDirectory {
 
     public String getPath() {
         return directoryFile.getAbsolutePath();
+    }
+
+    public Sprite getSprite(String characterName, String spriteName) {
+        String pathToCharacterDir = String.format("data/characters/%s", characterName);
+        File characterDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, pathToCharacterDir);
+        if(characterDirectory == null) {
+            return null;
+        }
+        for (String filename : characterDirectory.list()) {
+            if(filename.toLowerCase().startsWith(spriteName.toLowerCase())) {
+                return new Sprite(new File(characterDirectory, filename));
+            }
+        }
+        return null;
     }
 }

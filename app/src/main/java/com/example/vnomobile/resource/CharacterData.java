@@ -9,6 +9,8 @@ import org.ini4j.Wini;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 public class CharacterData {
@@ -61,15 +63,35 @@ public class CharacterData {
                 return name.endsWith(".ini") && !name.equals("char.ini");
             }
         });
+        Arrays.sort(iniFiles, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
     }
 
     public List<CharacterButton> getButtons(String name) {
         return null;
     }
 
-    public Sprite getSprite(String name) {
-        return null;
+    public String getName() {
+        return name;
     }
 
+    public String getShowName() {
+        return showName;
+    }
 
+    public String getMysteryName() {
+        return mysteryName;
+    }
+
+    public String getBlipsFileName() {
+        return blipsFileName;
+    }
+
+    public File[] getIniFiles() {
+        return iniFiles;
+    }
 }
