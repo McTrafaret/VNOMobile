@@ -18,4 +18,9 @@ public enum SpriteFlip implements CommandEnum {
     public String asRequestArgument() {
         return Integer.toString(flipNum);
     }
+
+    public SpriteFlip nextFlip() {
+        if(this.equals(NOFLIP)) return FLIP;
+        return NOFLIP;
+    }
 }

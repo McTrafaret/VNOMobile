@@ -4,13 +4,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.example.vnolib.client.model.Character;
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
+import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.exception.ResourceNotFoundException;
 import com.example.vnomobile.util.FileUtil;
+
+import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -128,4 +133,16 @@ public class DataDirectory {
         }
         return null;
     }
+
+    public UIDesign getDesign(String designName) {
+        String pathToDesign = String.format("data/UI/%s", designName);
+        File designDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, pathToDesign);
+        return new UIDesign(designDirectory);
+    }
+
+    public Wini getSettings() throws IOException {
+        File settingFile = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/settings.ini");
+        return new Wini(settingFile);
+    }
+
 }

@@ -20,10 +20,12 @@ import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -32,6 +34,8 @@ import com.example.vnolib.client.Client;
 import com.example.vnolib.client.model.BoxName;
 import com.example.vnolib.client.model.CharacterState;
 import com.example.vnolib.command.servercommands.enums.MessageColor;
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
+import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.exception.ResourceNotFoundException;
@@ -39,7 +43,10 @@ import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.CharacterIni;
 import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
+import com.example.vnomobile.resource.UIDesign;
 import com.example.vnomobile.util.UIUtil;
+
+import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,9 +64,9 @@ public class SceneFragment extends Fragment {
     private Spinner backgroundSelectSpinner;
     private Spinner iniSelectSpinner;
     private Spinner sfxSelectSpinner;
-    private ImageButton positionButton;
-    private ImageButton flipButton;
-    private ImageButton sfxButton;
+    private ImageView positionButton;
+    private ImageView flipButton;
+    private ImageView sfxButton;
 
     private Client client;
     private DataDirectory dataDirectory;
@@ -67,6 +74,11 @@ public class SceneFragment extends Fragment {
 
     private CharacterData characterData;
     private CharacterIni currentIniFile;
+
+    private Wini settings;
+    private UIDesign design;
+
+    private boolean sfxSelected = false;
 
     private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
 
@@ -90,14 +102,10 @@ public class SceneFragment extends Fragment {
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-
-        }
+        public void onStartTrackingTouch(SeekBar seekBar) {}
 
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-
-        }
+        public void onStopTrackingTouch(SeekBar seekBar) {}
     }
 
     private static class FileArrayAdapter extends ArrayAdapter<File> {
@@ -119,6 +127,17 @@ public class SceneFragment extends Fragment {
             return textView;
         }
 
+        @Override
+        public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+            File file = getItem(position);
+
+            if(convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, null);
+            }
+            TextView textView = convertView.findViewById(android.R.id.text1);
+            textView.setText(file.getName());
+            return textView;
+        }
     }
 
     public SceneFragment() {
@@ -133,6 +152,10 @@ public class SceneFragment extends Fragment {
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
         try {
             this.characterData = dataDirectory.getCharacterData(client.getCurrentCharacter());
+            this.currentIniFile = new CharacterIni(characterData.getIniFiles()[0]);
+            this.settings = dataDirectory.getSettings();
+            String designName = settings.get("DesignStyle", "design");
+            this.design = dataDirectory.getDesign(designName);
         } catch (Exception ex) {
             log.error("OnCreate: ", ex);
         }
@@ -178,10 +201,54 @@ public class SceneFragment extends Fragment {
         FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, characterData.getIniFiles());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         iniSelectSpinner.setAdapter(adapter);
+        iniSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                File selectedIniFile = characterData.getIniFiles()[position];
+                try {
+                    currentIniFile = new CharacterIni(selectedIniFile);
+                } catch (IOException e) {
+                    log.error("IniSelectSpinner onItemSelected: ", e);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
+
         this.positionButton = view.findViewById(R.id.position_button);
+        this.positionButton.setImageBitmap(design.getPositionToBitmapMap().get(state.getPosition()));
+        this.positionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SpritePosition newPosition = state.getPosition().nextPosition();
+                state.setPosition(newPosition);
+                positionButton.setImageBitmap(design.getPositionToBitmapMap().get(newPosition));
+            }
+        });
         this.flipButton = view.findViewById(R.id.flip_button);
+        this.flipButton.setImageBitmap(design.getFlipToBitmapMap().get(state.getFlip()));
+        this.flipButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SpriteFlip newFlip = state.getFlip().nextFlip();
+                state.setFlip(newFlip);
+                flipButton.setImageBitmap(design.getFlipToBitmapMap().get(newFlip));
+            }
+        });
+
         this.sfxButton = view.findViewById(R.id.sfx_button);
+        this.sfxButton.setImageBitmap(design.getSfxButtons()[sfxSelected ? 1 : 0]);
+        this.sfxButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sfxSelected = !sfxSelected;
+                sfxButton.setImageBitmap(design.getSfxButtons()[sfxSelected ? 1 : 0]);
+            }
+        });
     }
 }

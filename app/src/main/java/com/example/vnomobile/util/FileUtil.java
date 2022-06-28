@@ -57,6 +57,63 @@ public final class FileUtil {
         return result;
     }
 
+    /**
+     * Finds a file with such name case-insensitively and drops extension, so
+     * for example if directory contains file "image.png" and we are searching for
+     * directory/image it will find this file
+     *
+     * @param root -- directory to search
+     * @param childPath -- relative filename
+     * @return file if found or null
+     */
+    public static File getCaseInsensitiveSubFileDropExtension(File root, String childPath) {
+
+        String[] subfilesNames = childPath.split("/");
+
+        File result = root;
+        for(int i = 0; i < subfilesNames.length - 1; i++) {
+            String subfile = subfilesNames[i];
+
+            boolean found = false;
+            if(!result.isDirectory() || result.list() == null) {
+                return null;
+            }
+            for(String filename : result.list()) {
+                if(subfile.equalsIgnoreCase(filename)) {
+                    result = new File(result, filename);
+                    found = true;
+                    break;
+                }
+            }
+            if(!found) {
+                return null;
+            }
+        }
+
+        String filename = subfilesNames[subfilesNames.length-1];
+
+        File[] subfiles = result.listFiles();
+        if(subfiles == null) {
+            return null;
+        }
+
+        for (File subfile : subfiles) {
+
+            if(subfile.isDirectory()) {
+                continue;
+            }
+
+            String filenameNoExtension = subfile.getName().split("\\.")[0];
+
+            if(filenameNoExtension.equalsIgnoreCase(filename)) {
+                return subfile;
+            }
+        }
+
+        return null;
+    }
+
+
     @Nullable
     public static String getFullPathFromTreeUri(@Nullable final Uri treeUri, Context con) {
         if (treeUri == null) return null;

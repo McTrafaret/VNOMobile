@@ -15,4 +15,13 @@ public enum SpritePosition implements CommandEnum {
     public String asRequestArgument() {
         return Integer.toString(positionIndex);
     }
+
+    public SpritePosition nextPosition() {
+        switch (this) {
+            case LEFT: return RIGHT;
+            case RIGHT: return CENTER;
+            case CENTER: return LEFT;
+        }
+        return null;
+    }
 }
