@@ -58,7 +58,7 @@ public class CharacterIni {
                 sfxFile = getSfxFile(iniFile, sfxFileName);
             }
             File buttonFile = getButtonFile(iniFile, emotionsSection.get(key));
-            buttons[index] = new CharacterButton(buttonFile, sfxFile);
+            buttons[index-1] = new CharacterButton(buttonFile, sfxFile);
         }
     }
 }

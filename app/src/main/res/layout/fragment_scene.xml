@@ -91,7 +91,7 @@
         app:layout_constraintEnd_toStartOf="@+id/flip_button"
         app:layout_constraintStart_toEndOf="@+id/position_button" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/position_button"
         android:layout_width="70dp"
         android:layout_height="0dp"
@@ -100,10 +100,9 @@
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H, 37:20"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/flip_button"
         android:layout_width="70dp"
         android:layout_height="0dp"
@@ -113,18 +112,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H, 37:20"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:src="@tools:sample/avatars" />
+        />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/sfx_button"
-        android:layout_width="wrap_content"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/colors_slider"
         app:layout_constraintDimensionRatio="H, 67:19"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:src="@tools:sample/avatars" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <Spinner
         android:id="@+id/sfx_select_spinner"
@@ -135,7 +135,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/sfx_button"
         app:layout_constraintEnd_toStartOf="@+id/sfx_button"
         app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/sfx_button" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
