@@ -20,4 +20,8 @@ public class CharacterButton {
     public Bitmap getButtonBitmap() {
         return buttonBitmap;
     }
+
+    public String getAssociatedSpriteName() {
+        return buttonFile.getName().split("\\.")[0];
+    }
 }

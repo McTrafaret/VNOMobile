@@ -61,4 +61,8 @@ public class CharacterIni {
             buttons[index-1] = new CharacterButton(buttonFile, sfxFile);
         }
     }
+
+    public CharacterButton[] getButtons() {
+        return buttons;
+    }
 }
