@@ -19,12 +19,14 @@ public class UIDesign {
     private final EnumMap<SpritePosition, Bitmap> positionToBitmapMap;
     private final EnumMap<SpriteFlip, Bitmap> flipToBitmapMap;
     private final Bitmap[] sfxButtons;
+    private final Bitmap[] emoteSelectBitmaps;
 
     public UIDesign(File designDirectory) {
         this.designDirectory = designDirectory;
         this.positionToBitmapMap = createPositionToButtonBitmapMap(designDirectory);
         this.flipToBitmapMap = createFlipToButtonBitmapMap(designDirectory);
-        this.sfxButtons = createSfxButtons(designDirectory);
+        this.sfxButtons = retrieveSfxButtons(designDirectory);
+        this.emoteSelectBitmaps = retrieveEmoteSelectBitmaps(designDirectory);
     }
 
     private static EnumMap<SpritePosition, Bitmap> createPositionToButtonBitmapMap(File designDirectory) {
@@ -52,14 +54,25 @@ public class UIDesign {
         return map;
     }
 
-    private static Bitmap[] createSfxButtons(File designDirectory) {
+    private static Bitmap[] retrieveSfxButtons(File designDirectory) {
         Bitmap[] bitmaps = new Bitmap[2];
         File UIButtonsDirectory = FileUtil.getCaseInsensitiveSubFile(designDirectory, "buttons");
         File sfxOnFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "sfx_on");
         File sfxOffFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "sfx_off");
 
-        bitmaps[0] = BitmapFactory.decodeFile(sfxOnFile.getPath());
-        bitmaps[1] = BitmapFactory.decodeFile(sfxOffFile.getPath());
+        bitmaps[0] = BitmapFactory.decodeFile(sfxOffFile.getPath());
+        bitmaps[1] = BitmapFactory.decodeFile(sfxOnFile.getPath());
+
+        return bitmaps;
+    }
+
+    private static Bitmap[] retrieveEmoteSelectBitmaps(File designDirectory) {
+        Bitmap[] bitmaps = new Bitmap[2];
+        File emoteSelectedFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "emoteselected");
+        File emoteUnselectedFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "emoteunselected");
+
+        bitmaps[0] = BitmapFactory.decodeFile(emoteUnselectedFile.getPath());
+        bitmaps[1] = BitmapFactory.decodeFile(emoteSelectedFile.getPath());
 
         return bitmaps;
     }

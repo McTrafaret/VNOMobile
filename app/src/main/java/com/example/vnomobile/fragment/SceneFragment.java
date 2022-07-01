@@ -3,17 +3,14 @@ package com.example.vnomobile.fragment;
 import android.content.Context;
 import android.graphics.BlendMode;
 import android.graphics.BlendModeColorFilter;
-import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.graphics.BlendModeColorFilterCompat;
-import androidx.core.graphics.BlendModeCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -24,21 +21,19 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.vnolib.client.Client;
-import com.example.vnolib.client.model.BoxName;
 import com.example.vnolib.client.model.CharacterState;
 import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
-import com.example.vnomobile.exception.ResourceNotFoundException;
+import com.example.vnomobile.adapter.SpriteButtonsAdapter;
 import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.CharacterIni;
 import com.example.vnomobile.resource.DataDirectory;
@@ -74,6 +69,8 @@ public class SceneFragment extends Fragment {
 
     private CharacterData characterData;
     private CharacterIni currentIniFile;
+
+    private String[] backgroundNames;
 
     private Wini settings;
     private UIDesign design;
@@ -156,6 +153,8 @@ public class SceneFragment extends Fragment {
             this.settings = dataDirectory.getSettings();
             String designName = settings.get("DesignStyle", "design");
             this.design = dataDirectory.getDesign(designName);
+            this.backgroundNames = dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern());
+            this.state.setBackgroundName(backgroundNames[0]);
         } catch (Exception ex) {
             log.error("OnCreate: ", ex);
         }
@@ -189,6 +188,8 @@ public class SceneFragment extends Fragment {
         });
 
         this.listOfCharacterButtons = view.findViewById(R.id.list_of_character_buttons);
+        this.listOfCharacterButtons.setAdapter(new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state));
+        this.listOfCharacterButtons.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         this.colorsSlider = view.findViewById(R.id.colors_slider);
         colorsSlider.setMax(6);
@@ -196,6 +197,25 @@ public class SceneFragment extends Fragment {
         colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener(state));
 
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
+
+        ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item,
+                dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern()));
+
+        backgroundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        this.backgroundSelectSpinner.setAdapter(backgroundAdapter);
+        this.backgroundSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
         FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, characterData.getIniFiles());

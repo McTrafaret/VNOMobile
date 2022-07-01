@@ -12,6 +12,7 @@ import com.example.vnomobile.util.FileUtil;
 import org.ini4j.Wini;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,6 +144,27 @@ public class DataDirectory {
     public Wini getSettings() throws IOException {
         File settingFile = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/settings.ini");
         return new Wini(settingFile);
+    }
+
+    public String[] getBackgroundNames(String pattern) {
+        File backgroundsDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/background");
+        if(backgroundsDirectory == null) {
+            return null;
+        }
+        String[] backgroundsNames = backgroundsDirectory.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().startsWith(pattern.toLowerCase());
+            }
+        });
+        if(backgroundsNames == null) {
+            return null;
+        }
+        for(int i = 0; i < backgroundsNames.length; i++) {
+            backgroundsNames[i] = backgroundsNames[i].split("\\.")[0];
+        }
+        Arrays.sort(backgroundsNames);
+        return backgroundsNames;
     }
 
 }
