@@ -184,6 +184,7 @@ public class SceneFragment extends Fragment {
             public void onClick(View v) {
                 String message = messageInput.getText().toString();
                 client.sendICMessage(state, message);
+                messageInput.setText("");
             }
         });
 

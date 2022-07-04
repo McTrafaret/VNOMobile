@@ -9,10 +9,12 @@ import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

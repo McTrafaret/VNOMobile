@@ -20,6 +20,9 @@ public class UIDesign {
     private final EnumMap<SpriteFlip, Bitmap> flipToBitmapMap;
     private final Bitmap[] sfxButtons;
     private final Bitmap[] emoteSelectBitmaps;
+//    private final Bitmap arrow;
+    private final Bitmap backdrop;
+    private final Bitmap chatBox;
 
     public UIDesign(File designDirectory) {
         this.designDirectory = designDirectory;
@@ -27,6 +30,8 @@ public class UIDesign {
         this.flipToBitmapMap = createFlipToButtonBitmapMap(designDirectory);
         this.sfxButtons = retrieveSfxButtons(designDirectory);
         this.emoteSelectBitmaps = retrieveEmoteSelectBitmaps(designDirectory);
+        this.backdrop = retrieveBackdrop(designDirectory);
+        this.chatBox = retrieveChatBox(designDirectory);
     }
 
     private static EnumMap<SpritePosition, Bitmap> createPositionToButtonBitmapMap(File designDirectory) {
@@ -75,5 +80,26 @@ public class UIDesign {
         bitmaps[1] = BitmapFactory.decodeFile(emoteSelectedFile.getPath());
 
         return bitmaps;
+    }
+
+    // TODO: arrow is a gif, so we need to think this
+    private static Bitmap retrieveArrow(File designDirectory) {
+        return null;
+    }
+
+    private static Bitmap retrieveBackdrop(File designDirectory) {
+        File backdropFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "backdrop");
+        if(backdropFile == null) {
+            return null;
+        }
+        return BitmapFactory.decodeFile(backdropFile.getPath());
+    }
+
+    private static Bitmap retrieveChatBox(File designDirectory) {
+        File chatboxFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "chat");
+        if(chatboxFile == null) {
+            return null;
+        }
+        return BitmapFactory.decodeFile(chatboxFile.getPath());
     }
 }

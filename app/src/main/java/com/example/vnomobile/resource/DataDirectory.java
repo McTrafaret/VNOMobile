@@ -96,6 +96,11 @@ public class DataDirectory {
     }
 
     public CharacterData getCharacterData(Character character) throws ResourceNotFoundException, IOException {
+        return getCharacterData(character.getCharName());
+    }
+
+    public CharacterData getCharacterData(String characterName) throws IOException, ResourceNotFoundException {
+
         File charactersDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/characters");
         if(!charactersDirectory.exists() || !charactersDirectory.isDirectory()) {
             throw new ResourceNotFoundException("data/characters directory not found");
@@ -105,7 +110,7 @@ public class DataDirectory {
             return null;
         }
         for(String filename : charactersFileNames) {
-            if(filename.toUpperCase().startsWith(character.getCharName().toUpperCase())) {
+            if(filename.toUpperCase().startsWith(characterName.toUpperCase())) {
                 return new CharacterData(new File(charactersDirectory.getPath() + File.separator + filename));
             }
         }
@@ -165,6 +170,16 @@ public class DataDirectory {
         }
         Arrays.sort(backgroundsNames);
         return backgroundsNames;
+    }
+
+    public Bitmap getBackground(String backgroundName) {
+        String pathToBackground = String.format("data/background/%s", backgroundName);
+        File backgroundFile = FileUtil.getCaseInsensitiveSubFileDropExtension(directoryFile, pathToBackground);
+        if(backgroundFile == null) {
+            return null;
+        }
+
+        return BitmapFactory.decodeFile(backgroundFile.getPath());
     }
 
 }

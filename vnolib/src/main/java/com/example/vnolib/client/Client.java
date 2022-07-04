@@ -183,6 +183,10 @@ public class Client {
         }
     }
 
+    public String getUsername() {
+        return username;
+    }
+
     // O(n) I don't give a shit, I'm punk
     public Character getCharacterByName(String name) throws NoSuchCharacterException {
         synchronized (charactersLock) {
