@@ -3,13 +3,16 @@ package com.example.vnomobile.render;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Builder
 public class Render {
 
@@ -28,9 +31,10 @@ public class Render {
 
 
     public void draw(Canvas canvas, RenderModel model) {
-        canvas.drawBitmap(model.getBackground(), 0, 0, null);
+        Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
+        canvas.drawBitmap(model.getBackground(), null, canvasRect, null);
         for(RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
-            int offset = spriteInfo.getSpriteBitmap().getWidth() / 4;
+            int offset = canvas.getWidth() / 4;
             switch (spriteInfo.getPosition()) {
                 case LEFT:
                     offset = -offset;
@@ -39,11 +43,16 @@ public class Render {
                 case CENTER:
                     offset = 0;
             }
-            canvas.drawBitmap(spriteInfo.getSpriteBitmap(), offset, 0, null);
+            Rect spriteRect = new Rect(offset, 0, canvas.getWidth() + offset, canvas.getHeight());
+            log.debug("SpriteRect: {}", spriteRect);
+            canvas.drawBitmap(spriteInfo.getSpriteBitmap(), null, spriteRect, null);
         }
-        canvas.drawBitmap(model.getTextBox(), 0, canvas.getHeight() - model.getTextBox().getHeight(), null);
+        int boxHeight = canvas.getHeight() * model.getTextBox().getHeight() / model.getBackground().getHeight();
+        log.debug("BoxHeight: {}", boxHeight);
+        Rect boxRect = new Rect(0, canvas.getHeight() - boxHeight, canvas.getWidth(), canvas.getHeight());
+        canvas.drawBitmap(model.getTextBox(), null, boxRect, null);
 
-        Paint textBoxPaint = new Paint();
+        TextPaint textBoxPaint = new TextPaint();
         textBoxPaint.setColor(Color.WHITE);
         textBoxPaint.setTextSize(boxNameFontSize);
         canvas.drawText(model.getBoxName(), boxNameXOffset, boxNameYOffset, textBoxPaint);
@@ -51,11 +60,10 @@ public class Render {
         TextPaint textPaint = new TextPaint();
         textPaint.setColor(model.getTextColor());
         textPaint.setTextSize(textFontSize);
-        canvas.drawText(model.getBoxName(), textXOffset, textYOffset, textPaint);
 
         StaticLayout staticLayout;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length() - 1, textPaint, canvas.getWidth() - textXOffset)
+            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length(), textPaint, canvas.getWidth() - textXOffset)
                     .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                     .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
                     .setIncludePad(INCLUDE_SPACING)
@@ -72,7 +80,7 @@ public class Render {
                     INCLUDE_SPACING);
         }
         canvas.save();
-        canvas.translate(-textXOffset, -textYOffset);
+        canvas.translate(textXOffset, textYOffset);
         staticLayout.draw(canvas);
         canvas.restore();
     }

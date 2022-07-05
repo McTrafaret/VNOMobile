@@ -7,7 +7,10 @@ import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.util.FileUtil;
 
+import org.ini4j.Wini;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.EnumMap;
 
 import lombok.Getter;
@@ -23,8 +26,10 @@ public class UIDesign {
 //    private final Bitmap arrow;
     private final Bitmap backdrop;
     private final Bitmap chatBox;
+    private final Wini settings;
 
     public UIDesign(File designDirectory) {
+        Wini settings1;
         this.designDirectory = designDirectory;
         this.positionToBitmapMap = createPositionToButtonBitmapMap(designDirectory);
         this.flipToBitmapMap = createFlipToButtonBitmapMap(designDirectory);
@@ -32,6 +37,13 @@ public class UIDesign {
         this.emoteSelectBitmaps = retrieveEmoteSelectBitmaps(designDirectory);
         this.backdrop = retrieveBackdrop(designDirectory);
         this.chatBox = retrieveChatBox(designDirectory);
+        try {
+            settings1 = parseSettings(designDirectory);
+        } catch (IOException e) {
+            settings1 = null;
+            e.printStackTrace();
+        }
+        this.settings = settings1;
     }
 
     private static EnumMap<SpritePosition, Bitmap> createPositionToButtonBitmapMap(File designDirectory) {
@@ -101,5 +113,10 @@ public class UIDesign {
             return null;
         }
         return BitmapFactory.decodeFile(chatboxFile.getPath());
+    }
+
+    private static Wini parseSettings(File designDirectory) throws IOException {
+        File settingsFile = FileUtil.getCaseInsensitiveSubFile(designDirectory, "design.ini");
+        return new Wini(settingsFile);
     }
 }

@@ -7,8 +7,10 @@ import org.ini4j.Profile;
 import org.ini4j.Wini;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -32,7 +34,7 @@ public class CharacterData {
             throw new ResourceNotFoundException(String.format("char.ini not found in %s", charDirectory.getPath()));
         }
 
-        Wini charIni = new Wini(charIniFile);
+        Wini charIni = new Wini(new InputStreamReader(new FileInputStream(charIniFile), "cp1251"));
 
         Profile.Section section = null;
         for(String sectionName : charIni.keySet()) {

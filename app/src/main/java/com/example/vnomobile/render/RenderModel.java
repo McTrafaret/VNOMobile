@@ -8,13 +8,14 @@ import java.util.List;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Builder
 @Getter
 public class RenderModel {
 
     @Getter
-    public class SpriteDrawInfo {
+    public static class SpriteDrawInfo {
         private Bitmap spriteBitmap;
         private SpritePosition position;
 
@@ -28,7 +29,8 @@ public class RenderModel {
     private Bitmap textBox;
     private List<SpriteDrawInfo>  spriteDrawInfo;
     private String boxName;
-    private String text;
     private int textColor;
 
+    @Setter
+    private String text;
 }
