@@ -2,6 +2,8 @@ package com.example.vnomobile.resource;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
+import android.media.SoundPool;
 
 import com.example.vnolib.client.model.Character;
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
@@ -180,6 +182,11 @@ public class DataDirectory {
         }
 
         return BitmapFactory.decodeFile(backgroundFile.getPath());
+    }
+
+    public File getBleepFile(String bleepName) {
+        File bleepsDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds/bleeps");
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(bleepsDirectory, bleepName);
     }
 
 }

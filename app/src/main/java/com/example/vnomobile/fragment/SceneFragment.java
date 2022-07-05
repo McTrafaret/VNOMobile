@@ -27,13 +27,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.vnolib.client.Client;
+import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.CharacterState;
+import com.example.vnolib.command.servercommands.MSCommand;
 import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.SpriteButtonsAdapter;
+import com.example.vnomobile.render.Engine;
 import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.CharacterIni;
 import com.example.vnomobile.resource.DataDirectory;
@@ -75,7 +78,14 @@ public class SceneFragment extends Fragment {
     private Wini settings;
     private UIDesign design;
 
+    private Engine sceneHandlerEngine;
+
     private boolean sfxSelected = false;
+
+    @OnCommand(MSCommand.class)
+    public void onICMessage(MSCommand command) {
+        sceneHandlerEngine.handle(command);
+    }
 
     private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
 
@@ -176,6 +186,7 @@ public class SceneFragment extends Fragment {
         this.sceneView = view.findViewById(R.id.scene_view);
         this.messageInput = view.findViewById(R.id.character_message_input);
 
+        this.sceneHandlerEngine = new Engine(sceneView, dataDirectory, design);
 
         this.sendButton = view.findViewById(R.id.send_character_message_button);
 
@@ -271,5 +282,7 @@ public class SceneFragment extends Fragment {
                 sfxButton.setImageBitmap(design.getSfxButtons()[sfxSelected ? 1 : 0]);
             }
         });
+
+        this.client.subscribeToCommand(MSCommand.class, this);
     }
 }
