@@ -2,59 +2,97 @@ package com.example.vnomobile.fragment;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 
+import com.example.vnolib.client.Client;
+import com.example.vnolib.client.OnCommand;
+import com.example.vnolib.client.model.BoxName;
+import com.example.vnolib.command.servercommands.MCCommand;
+import com.example.vnolib.command.servercommands.MSCommand;
+import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
+import com.example.vnomobile.adapter.StringListAdapter;
+import com.example.vnomobile.resource.CharacterData;
+import com.example.vnomobile.resource.DataDirectory;
+import com.example.vnomobile.resource.ResourceHandler;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LogFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class LogFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private RecyclerView recyclerView;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private Client client;
+    private DataDirectory dataDirectory;
+    private List<String> messageLog = Collections.synchronizedList(new ArrayList<>());
 
     public LogFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LogFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LogFragment newInstance(String param1, String param2) {
-        LogFragment fragment = new LogFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    Runnable updateViewRunnable = new Runnable() {
+        @Override
+        public void run() {
+            recyclerView.getAdapter().notifyItemInserted(messageLog.size() - 1);
+        }
+    };
+
+    @OnCommand(MSCommand.class)
+    public void onICMessage(MSCommand command) {
+        BoxName boxName = BoxName.fromString(command.getBoxName());
+        String nameToShow = "???";
+        try {
+            CharacterData characterData =
+                    dataDirectory.getCharacterData(command.getCharacterName());
+            switch (boxName) {
+
+                case CHARACTER_NAME:
+                    nameToShow = characterData.getShowName();
+                    break;
+                case MYSTERYNAME:
+                    nameToShow = characterData.getMysteryName();
+                    break;
+                case USERNAME:
+                    nameToShow = command.getBoxName();
+                    break;
+            }
+        } catch (Exception ex) {
+            log.error("Error when writing to log: ", ex);
+        }
+        String logEntry = String.format("%s: %s", nameToShow, command.getMessage());
+        messageLog.add(logEntry);
+        getActivity().runOnUiThread(updateViewRunnable);
+    }
+
+    @OnCommand(MCCommand.class)
+    public void onMusicCued(MCCommand command) {
+        messageLog.add(String.format("%s cue'd a music:%n%s", command.getCharacterName(), command.getTrackName()) +
+                (command.getLoopingStatus().isLooping() ? "(looping)" : ""));
+        getActivity().runOnUiThread(updateViewRunnable);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        client = ClientHandler.getClient();
+        dataDirectory = ResourceHandler.getInstance().getDirectory();
+        client.subscribeToCommand(MSCommand.class, this);
+        client.subscribeToCommand(MCCommand.class, this);
     }
 
     @Override
@@ -62,5 +100,14 @@ public class LogFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_log, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        recyclerView = view.findViewById(R.id.log_recycler_view);
+        StringListAdapter adapter = new StringListAdapter(messageLog);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
     }
 }

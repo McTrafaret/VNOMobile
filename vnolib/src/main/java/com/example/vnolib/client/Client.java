@@ -344,6 +344,10 @@ public class Client {
         commandHandler.unsubscribeFromCommand(commandClass, object);
     }
 
+    public void unsubscribeAll() {
+        commandHandler.unsubscribeAll();
+    }
+
     public void getMod(String modPassword) throws ConnectionException {
         if(vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
             throw new ConnectionException("Not connected to server");

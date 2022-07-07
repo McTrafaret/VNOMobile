@@ -36,6 +36,10 @@ public class PublisherCommandHandler extends Thread implements CommandHandler {
         }
     }
 
+    public void unsubscribeAll() {
+        publisher.unsubscribeAll();
+    }
+
     public void stopHandler() {
         running = false;
         synchronized (this) {
@@ -85,4 +89,5 @@ public class PublisherCommandHandler extends Thread implements CommandHandler {
             }
         }
     }
+
 }

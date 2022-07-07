@@ -26,6 +26,10 @@ public class CommandPublisher {
         }
     }
 
+    public synchronized void unsubscribeAll() {
+        commandToSubscriberMap.clear();
+    }
+
     public void publish(BaseCommand command) throws InvocationTargetException, IllegalAccessException {
         if(commandToSubscriberMap.containsKey(command.getClass())) {
             for (Object subscriber : commandToSubscriberMap.get(command.getClass())) {
