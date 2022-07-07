@@ -212,7 +212,7 @@ public class SceneFragment extends Fragment {
 
         ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
-                dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern()));
+                backgroundNames);
 
         backgroundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -220,7 +220,7 @@ public class SceneFragment extends Fragment {
         this.backgroundSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                state.setBackgroundName(backgroundNames[position]);
             }
 
             @Override

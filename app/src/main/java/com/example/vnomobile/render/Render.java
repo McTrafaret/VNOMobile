@@ -31,8 +31,11 @@ public class Render {
 
 
     public void draw(Canvas canvas, RenderModel model) {
+        Paint antiAliasPaint = new Paint();
+        antiAliasPaint.setAntiAlias(true);
+        antiAliasPaint.setFilterBitmap(true);
         Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.drawBitmap(model.getBackground(), null, canvasRect, null);
+        canvas.drawBitmap(model.getBackground(), null, canvasRect, antiAliasPaint);
         for(RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
             int offset = canvas.getWidth() / 4;
             switch (spriteInfo.getPosition()) {
@@ -44,15 +47,17 @@ public class Render {
                     offset = 0;
             }
             Rect spriteRect = new Rect(offset, 0, canvas.getWidth() + offset, canvas.getHeight());
-            log.debug("SpriteRect: {}", spriteRect);
-            canvas.drawBitmap(spriteInfo.getSpriteBitmap(), null, spriteRect, null);
+            canvas.drawBitmap(spriteInfo.getSpriteBitmap(), null, spriteRect, antiAliasPaint);
+        }
+        if(model.getText().trim().isEmpty()) {
+            return;
         }
         int boxHeight = canvas.getHeight() * model.getTextBox().getHeight() / model.getBackground().getHeight();
-        log.debug("BoxHeight: {}", boxHeight);
         Rect boxRect = new Rect(0, canvas.getHeight() - boxHeight, canvas.getWidth(), canvas.getHeight());
-        canvas.drawBitmap(model.getTextBox(), null, boxRect, null);
+        canvas.drawBitmap(model.getTextBox(), null, boxRect, antiAliasPaint);
 
         TextPaint textBoxPaint = new TextPaint();
+        textBoxPaint.setAntiAlias(true);
         textBoxPaint.setColor(Color.WHITE);
         textBoxPaint.setTextSize(boxNameFontSize);
         canvas.drawText(model.getBoxName(), boxNameXOffset, boxNameYOffset, textBoxPaint);
@@ -60,6 +65,7 @@ public class Render {
         TextPaint textPaint = new TextPaint();
         textPaint.setColor(model.getTextColor());
         textPaint.setTextSize(textFontSize);
+        textPaint.setAntiAlias(true);
 
         StaticLayout staticLayout;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

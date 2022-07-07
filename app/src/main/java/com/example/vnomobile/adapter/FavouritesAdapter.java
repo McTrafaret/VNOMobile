@@ -8,18 +8,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnolib.client.model.Server;
-import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.viewholder.ListOfServersViewHolder;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
-@Slf4j
-public class ListOfServersAdapter extends RecyclerView.Adapter<ListOfServersViewHolder> {
+public class FavouritesAdapter extends RecyclerView.Adapter<ListOfServersViewHolder> {
 
+    private List<Server> serverList;
     private OnServerEntryListener listener;
 
-    public ListOfServersAdapter(OnServerEntryListener listener) {
+    public FavouritesAdapter(OnServerEntryListener listener, List<Server> serverList) {
+        this.serverList = serverList;
         this.listener = listener;
     }
 
@@ -33,13 +33,11 @@ public class ListOfServersAdapter extends RecyclerView.Adapter<ListOfServersView
 
     @Override
     public void onBindViewHolder(@NonNull ListOfServersViewHolder holder, int position) {
-        Server server = ClientHandler.getClient().getServers().get(position);
-        holder.bind(server);
+        holder.bind(serverList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return ClientHandler.getClient().getServers().size();
+        return serverList.size();
     }
-
 }

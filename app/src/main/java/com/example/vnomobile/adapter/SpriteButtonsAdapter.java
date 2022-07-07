@@ -84,7 +84,9 @@ public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdap
             Bitmap result = Bitmap.createBitmap(bitmap1.getWidth(), bitmap1.getHeight(), bitmap1.getConfig());
             Canvas canvas = new Canvas(result);
             canvas.drawBitmap(bitmap1, new Matrix(), null);
-            canvas.drawBitmap(bitmap2, 0, 0, null);
+            int xoffset = (bitmap1.getWidth() - bitmap2.getWidth()) / 2;
+            int yoffset = (bitmap1.getHeight() - bitmap2.getHeight()) / 2;
+            canvas.drawBitmap(bitmap2, xoffset, yoffset, null);
             return result;
         }
     }
