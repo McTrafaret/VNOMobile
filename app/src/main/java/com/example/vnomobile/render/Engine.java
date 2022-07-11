@@ -13,6 +13,7 @@ import com.example.vnolib.command.servercommands.MSCommand;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.DataDirectory;
+import com.example.vnomobile.resource.SoundHandler;
 import com.example.vnomobile.resource.Sprite;
 import com.example.vnomobile.resource.UIDesign;
 import com.example.vnomobile.util.UIUtil;
@@ -40,13 +41,13 @@ public class Engine {
     private final UIDesign design;
     private final Render render;
 
-    private final SoundPool soundPool;
+    private final SoundHandler soundHandler;
 
     private final RunThread runThread;
 
     private final Lock modelLock = new ReentrantLock();
 
-    private int bleepId;
+    private String bleepName;
     private String currentMessage;
     private RenderModel currentModelWithoutMessage;
     private volatile boolean modelChanged = false;
@@ -86,7 +87,7 @@ public class Engine {
                         }
                         if (lastShownLetterIndex <= currentMessage.length() - 1) {
                             if(!Character.isSpaceChar(currentMessage.charAt(lastShownLetterIndex))) {
-                                soundPool.play(bleepId, 1, 1, 1, 0, 1);
+                                soundHandler.playBleep(bleepName);
                             }
                             currentModelWithoutMessage.setText(currentMessage.substring(0,
                                     lastShownLetterIndex + 1));
@@ -133,15 +134,7 @@ public class Engine {
         };
         this.surfaceView.getHolder().addCallback(surfaceCallback);
 
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build();
-
-        this.soundPool = new SoundPool.Builder()
-                .setAudioAttributes(attributes)
-                .setMaxStreams(5)
-                .build();
+        this.soundHandler = SoundHandler.getInstance();
 
         this.dataDirectory = dataDirectory;
         this.design = design;
@@ -160,7 +153,7 @@ public class Engine {
 
     public void handle(MSCommand command) {
         String nameToShow = null;
-        File bleepFile = null;
+        String bleepName = null;
         BoxName boxName = BoxName.fromString(command.getBoxName());
         try {
             CharacterData characterData =
@@ -176,7 +169,7 @@ public class Engine {
                     nameToShow = command.getBoxName();
                     break;
             }
-            bleepFile = dataDirectory.getBleepFile(characterData.getBlipsFileName());
+            bleepName = characterData.getBlipsFileName();
         } catch (Exception ex) {
             if (boxName.equals(BoxName.USERNAME)) {
                 nameToShow = command.getBoxName();
@@ -217,7 +210,7 @@ public class Engine {
 
 
         synchronized (modelLock) {
-            bleepId = soundPool.load(bleepFile.getPath(), 1);
+            this.bleepName = bleepName;
             currentMessage = command.getMessage();
             currentModelWithoutMessage = RenderModel.builder()
                     .boxName(nameToShow)

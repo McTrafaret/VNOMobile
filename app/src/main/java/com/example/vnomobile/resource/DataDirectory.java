@@ -203,10 +203,35 @@ public class DataDirectory {
         return BitmapFactory.decodeFile(backgroundFile.getPath());
     }
 
+    public File[] getBleeps() {
+        File bleepsDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +
+                "/bleeps");
+
+        return bleepsDirectory == null ? null : bleepsDirectory.listFiles();
+    }
+
     public File getBleepFile(String bleepName) {
         File bleepsDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +
                 "/bleeps");
         return FileUtil.getCaseInsensitiveSubFileDropExtension(bleepsDirectory, bleepName);
+    }
+
+    public File[] getSfxFiles() {
+
+        File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +
+                "/sfx");
+
+        return sfxDirectory == null ? null : sfxDirectory.listFiles();
+    }
+
+    public File getMusicTrack(String trackName) {
+        File musicDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds/music");
+        if(musicDirectory == null) {
+            log.warn("Music directory not found");
+            return null;
+        }
+
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(musicDirectory, trackName);
     }
 
     public List<Server> getFavourites() {
