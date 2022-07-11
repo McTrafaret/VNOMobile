@@ -22,15 +22,15 @@ public class MCCommand extends BaseCommand {
     @CommandArgument(index = 0, optional = false)
     String characterName;
 
-    @CommandArgument(index = 0, optional = false)
+    @CommandArgument(index = 1, optional = false)
     String trackName;
 
-    @CommandArgument(index = 0, optional = false)
+    @CommandArgument(index = 2, optional = false)
     int trackId;
 
-    @CommandArgument(index = 0, optional = false)
+    @CommandArgument(index = 3, optional = false)
     int characterId;
 
-    @CommandArgument(index = 0, optional = false)
+    @CommandArgument(index = 4, optional = false)
     LoopingStatus loopingStatus;
 }
