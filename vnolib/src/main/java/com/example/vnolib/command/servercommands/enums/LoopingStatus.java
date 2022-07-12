@@ -14,6 +14,13 @@ public enum LoopingStatus implements CommandEnum {
         return statusNum != 0;
     }
 
+    public static LoopingStatus fromBoolean(boolean status) {
+        if(status) {
+            return LOOPING;
+        }
+        return NOT_LOOPING;
+    }
+
     @Override
     public String asRequestArgument() {
         return Integer.toString(statusNum);

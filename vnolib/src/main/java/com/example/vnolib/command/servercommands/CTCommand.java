@@ -5,6 +5,7 @@ import com.example.vnolib.command.Command;
 import com.example.vnolib.command.CommandArgument;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ import lombok.ToString;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @ToString
 @Command(name = "CT", numOfArguments = 2)
 public class CTCommand extends BaseCommand {

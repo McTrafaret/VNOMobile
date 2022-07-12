@@ -22,6 +22,7 @@ import com.example.vnolib.exception.NoSuchCharacterException;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -161,7 +162,13 @@ public class Client {
 
     public Area getAreaById(int id) {
         synchronized (areaLock) {
-            return areas[id-1];
+            return areas[id - 1];
+        }
+    }
+
+    public Area[] getAreas() {
+        synchronized (areaLock) {
+            return Arrays.copyOf(areas, areas.length);
         }
     }
 
@@ -180,6 +187,12 @@ public class Client {
     public Character getCharacterByIndex(int index) {
         synchronized (charactersLock) {
             return characters[index];
+        }
+    }
+
+    public Track[] getTracks() {
+        synchronized (tracksLock) {
+            return Arrays.copyOf(tracks, tracks.length);
         }
     }
 
@@ -212,7 +225,7 @@ public class Client {
     }
 
     public void authenticate(String login, String password) throws ConnectionException, NoSuchAlgorithmException {
-        if(!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
+        if (!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
             // TODO Exception
             throw new ConnectionException("Not connected to master");
         }
@@ -220,7 +233,7 @@ public class Client {
     }
 
     public void requestServer(int index) throws ConnectionException {
-        if(!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
+        if (!asConnection.getStatus().equals(ConnectionStatus.CONNECTED)) {
             // TODO Exception
             throw new ConnectionException("Not connected to master");
         }
@@ -232,19 +245,19 @@ public class Client {
     }
 
     public void requestAreas() {
-        for(int i = 1; i <= areas.length; i++) {
+        for (int i = 1; i <= areas.length; i++) {
             vnoConnection.sendAreaRequest(i);
         }
     }
 
     public void requestCharacters() {
-        for(int i = 1; i <= characters.length; i += 2) {
+        for (int i = 1; i <= characters.length; i += 2) {
             vnoConnection.sendCharacterRequest(i);
         }
     }
 
     public void requestTracks() {
-        for(int i = 1; i <= tracks.length; i++) {
+        for (int i = 1; i <= tracks.length; i++) {
             vnoConnection.sendTrackRequest(i);
         }
     }
@@ -254,7 +267,7 @@ public class Client {
     }
 
     public void pickCharacter(Character character, String password) {
-        if(currentCharacter != null) {
+        if (currentCharacter != null) {
             vnoConnection.sendChangeRequest();
             currentCharacter = null;
         }
@@ -262,13 +275,13 @@ public class Client {
     }
 
     public void sendICMessage(BoxName boxName,
-                         String spriteName,
-                         String message,
-                         MessageColor color,
-                         String backgroundImageName,
-                         SpritePosition position,
-                         SpriteFlip flip,
-                         String sfx) {
+                              String spriteName,
+                              String message,
+                              MessageColor color,
+                              String backgroundImageName,
+                              SpritePosition position,
+                              SpriteFlip flip,
+                              String sfx) {
 
         String boxNameString = boxName.equals(BoxName.USERNAME) ? username : boxName.getRequestString();
         vnoConnection.sendICMessage(currentCharacter.getCharName(), spriteName, message, boxNameString, color, currentCharacter.getCharId(), backgroundImageName, position, flip, sfx);
@@ -285,6 +298,28 @@ public class Client {
         String sfx = state.getSfx();
 
         sendICMessage(boxName, spriteName, message, color, backgroundImageName, position, flip, sfx);
+    }
+
+    public void sendOOCMessage(String message) {
+        vnoConnection.sendOOCMessage(username, message);
+    }
+
+    public void playTrack(String trackName, LoopingStatus loopingStatus) {
+        Track trackToPlay = null;
+        synchronized (tracksLock) {
+            for (Track track : tracks) {
+                if (track.getTrackName().equals(trackName)) {
+                    trackToPlay = track;
+                    break;
+                }
+            }
+        }
+        if(trackToPlay == null) {
+            log.error("No such track {}", trackName);
+            return;
+        }
+
+        playTrack(trackToPlay, loopingStatus);
     }
 
     public void playTrack(Track track, LoopingStatus loopingStatus) {
@@ -306,7 +341,7 @@ public class Client {
     }
 
     public void connectToMaster() throws ConnectionException, IOException {
-        if(asConnection != null) {
+        if (asConnection != null) {
             throw new ConnectionException(String.format("Already connected to master. Ip: %s", asConnection.getHost()));
         }
         asConnection = new ASConnection(MASTER_IP, MASTER_PORT, commandsToRead, commandHandler);
@@ -314,14 +349,14 @@ public class Client {
     }
 
     public void disconnectFromMaster() throws IOException, ConnectionException {
-        if(asConnection == null) {
+        if (asConnection == null) {
             throw new ConnectionException("Not connected to master");
         }
         asConnection.disconnect();
     }
 
     public void connectToServer(Server server) throws ConnectionException, IOException {
-        if(vnoConnection != null) {
+        if (vnoConnection != null) {
             throw new ConnectionException(String.format("Already connected to server. Server info: %s", vnoConnection.getServer()));
         }
         vnoConnection = new VNOConnection(server, commandsToRead, commandHandler);
@@ -349,7 +384,7 @@ public class Client {
     }
 
     public void getMod(String modPassword) throws ConnectionException {
-        if(vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
+        if (vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
             throw new ConnectionException("Not connected to server");
         }
         vnoConnection.requestMod(modPassword);

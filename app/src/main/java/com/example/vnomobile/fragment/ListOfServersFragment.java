@@ -2,16 +2,15 @@ package com.example.vnomobile.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;
@@ -23,6 +22,7 @@ import com.example.vnomobile.LoadingActivity;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.ListOfServersAdapter;
 import com.example.vnomobile.adapter.OnServerEntryListener;
+import com.example.vnomobile.resource.LogHandler;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +43,7 @@ public class ListOfServersFragment extends Fragment implements OnServerEntryList
     @OnCommand(PCCommand.class)
     private void  connectedToServer(PCCommand command) {
         client.unsubscribeAll();
+        LogHandler.create();
         Intent intent = new Intent(getActivity(), LoadingActivity.class);
         startActivity(intent);
     }
