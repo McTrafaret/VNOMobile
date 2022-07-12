@@ -3,6 +3,7 @@ package com.example.vnolib.connection;
 import com.example.vnolib.client.model.Server;
 import com.example.vnolib.command.BaseCommand;
 import com.example.vnolib.command.servercommands.ARCCommand;
+import com.example.vnolib.command.servercommands.CTCommand;
 import com.example.vnolib.command.servercommands.ChangeCommand;
 import com.example.vnolib.command.servercommands.MCCommand;
 import com.example.vnolib.command.servercommands.MODCommand;
@@ -89,6 +90,10 @@ public class VNOConnection extends ServerConnection {
                 .flip(flip)
                 .sfx(sfx)
                 .build());
+    }
+
+    public void sendOOCMessage(String username, String message) {
+        sendCommand(new CTCommand(username, message));
     }
 
     public void sendPlayTrackRequest(String charName, String trackName, int trackId, int charId, LoopingStatus loopingStatus) {

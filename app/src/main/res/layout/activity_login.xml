@@ -28,6 +28,12 @@
             android:minHeight="48dp"
             android:importantForAutofill="no" />
 
+        <CheckBox
+            android:id="@+id/remember_me_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remember_me" />
+
         <Button
             android:id="@+id/identify_button"
             android:layout_width="match_parent"

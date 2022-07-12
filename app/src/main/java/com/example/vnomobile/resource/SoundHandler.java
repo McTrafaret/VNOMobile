@@ -63,18 +63,6 @@ public class SoundHandler {
             int sfxId = soundPool.load(file.getPath(), 1);
             sfxMap.put(file.getName().split("\\.")[0], sfxId);
         }
-
-        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
-            @Override
-            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
-                if (currentMusicId != null && currentMusicId.equals(sampleId) && status == 0) {
-                    if (musicStreamId != null) {
-                        soundPool.stop(musicStreamId);
-                    }
-                    soundPool.play(sampleId, 1, 1, 1, loopMusic ? 1 : 0, 1);
-                }
-            }
-        });
     }
 
     public static SoundHandler getInstance() {
@@ -123,6 +111,5 @@ public class SoundHandler {
             return;
         }
         mediaPlayer.start();
-        currentMusicId = soundPool.load(musicFile.getPath(), 1);
     }
 }
