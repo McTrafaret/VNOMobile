@@ -3,18 +3,17 @@ package com.example.vnomobile.render;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.util.DisplayMetrics;
 import android.view.View;
 
-import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.example.vnomobile.util.FileUtil;
-
-import java.io.File;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +29,7 @@ public class Render {
 
     private final View view;
 
-    private final GifDrawable arrowGif;
+    private final Bitmap[] arrowGifSequence;
 
     private final int boxNameXOffset;
     private final int boxNameYOffset;
@@ -46,17 +45,25 @@ public class Render {
     private int arrowFrame = 0;
 
 
-    public void nextArrowFrame() {
-        arrowFrame = (arrowFrame + 1) % arrowGif.getFrameCount();
+    public void resetArrowFrame() {
+        arrowFrame = 0;
     }
+
+    private void nextArrowFrame() {
+        arrowFrame = (arrowFrame + 1) % arrowGifSequence.length;
+    }
+
 
     public void draw(Canvas canvas, RenderModel model) {
         Paint antiAliasPaint = new Paint();
         antiAliasPaint.setAntiAlias(true);
         antiAliasPaint.setFilterBitmap(true);
         Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
-        Bitmap backgrouundBitmap = FileUtil.loadBitmapFromFile(view, model.getBackgroundFile());
-        canvas.drawBitmap(backgrouundBitmap, null, canvasRect, antiAliasPaint);
+        Bitmap backgroundBitmap = FileUtil.loadBitmapFromFile(view, model.getBackgroundFile());
+        canvas.drawBitmap(backgroundBitmap, null, canvasRect, antiAliasPaint);
+        if(model.getState().equals(RenderState.ONLY_BACKGROUND)) {
+            return;
+        }
         for(RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
             int offset = canvas.getWidth() / 4;
             switch (spriteInfo.getPosition()) {
@@ -75,7 +82,7 @@ public class Render {
             return;
         }
         Bitmap textBoxBitmap = FileUtil.loadBitmapFromFile(view, model.getTextBoxFile());
-        int boxHeight = canvas.getHeight() * textBoxBitmap.getHeight() / backgrouundBitmap.getHeight();
+        int boxHeight = canvas.getHeight() * textBoxBitmap.getHeight() / backgroundBitmap.getHeight();
         Rect boxRect = new Rect(0, canvas.getHeight() - boxHeight, canvas.getWidth(), canvas.getHeight());
         canvas.drawBitmap(textBoxBitmap, null, boxRect, antiAliasPaint);
 
@@ -112,5 +119,16 @@ public class Render {
         canvas.translate(textXOffset, textYOffset);
         staticLayout.draw(canvas);
         canvas.restore();
+        if(model.getState().equals(RenderState.NO_ARROW) || arrowGifSequence == null) {
+            return;
+        }
+
+        DisplayMetrics metrics = view.getResources().getDisplayMetrics();
+        Matrix matrix = new Matrix();
+        matrix.postScale(metrics.scaledDensity, metrics.scaledDensity);
+        matrix.postTranslate(arrowXOffset, arrowYOffset);
+
+        canvas.drawBitmap(arrowGifSequence[arrowFrame], matrix, antiAliasPaint);
+        nextArrowFrame();
     }
 }
