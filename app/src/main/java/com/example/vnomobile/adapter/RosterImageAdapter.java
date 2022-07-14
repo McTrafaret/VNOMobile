@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.model.Character;
 import com.example.vnomobile.ClientHandler;
@@ -71,10 +72,16 @@ public class RosterImageAdapter extends BaseAdapter {
         if(nameToRosterImageMap.containsKey(character.getCharName())) {
             RosterImage rosterImage = nameToRosterImageMap.get(character.getCharName());
             if(character.getTaken() == 0) {
-                imageView.setImageBitmap(rosterImage.getOffIcon());
+                Glide.with(parent.getContext())
+                        .load(rosterImage.getOffIconFile())
+                        .error(R.drawable.saul_icon)
+                        .into(imageView);
             }
             else {
-                imageView.setImageBitmap(rosterImage.getOnIcon());
+                Glide.with(parent.getContext())
+                        .load(rosterImage.getOnIconFile())
+                        .error(R.drawable.saul_icon)
+                        .into(imageView);
             }
         }
         else {

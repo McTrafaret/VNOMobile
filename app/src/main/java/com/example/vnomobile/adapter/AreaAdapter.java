@@ -1,8 +1,6 @@
 package com.example.vnomobile.adapter;
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,13 +9,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.vnolib.client.model.Area;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
+
+import java.io.File;
 
 public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> {
 
@@ -74,10 +78,21 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
         }
 
         public void bind(Area area, boolean selected, boolean current) {
-            Bitmap backgroundBitmap = dataDirectory.getBackground(area.getBackgroundNamePattern());
-            if(backgroundBitmap != null) {
-                Drawable drawable = new BitmapDrawable(resources, backgroundBitmap);
-                layout.setBackground(drawable);
+            File backgroundFile = dataDirectory.getBackgroundFile(area.getBackgroundNamePattern());
+            if(backgroundFile != null) {
+                Glide.with(layout.getContext())
+                        .load(backgroundFile)
+                        .error(R.drawable.saul_icon)
+                        .into(new CustomTarget<Drawable>() {
+                            @Override
+                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                layout.setBackground(resource);
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+                            }
+                        });
             }
             if(current) {
                 youAreHereText.setVisibility(View.VISIBLE);

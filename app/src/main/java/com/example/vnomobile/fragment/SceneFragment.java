@@ -6,13 +6,6 @@ import android.graphics.BlendModeColorFilter;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -26,6 +19,13 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.CharacterState;
@@ -200,7 +200,8 @@ public class SceneFragment extends Fragment {
         });
 
         this.listOfCharacterButtons = view.findViewById(R.id.list_of_character_buttons);
-        this.listOfCharacterButtons.setAdapter(new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state));
+        SpriteButtonsAdapter buttonsAdapter = new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state);
+        this.listOfCharacterButtons.setAdapter(buttonsAdapter);
         this.listOfCharacterButtons.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
 
         this.colorsSlider = view.findViewById(R.id.colors_slider);
@@ -239,6 +240,8 @@ public class SceneFragment extends Fragment {
                 File selectedIniFile = characterData.getIniFiles()[position];
                 try {
                     currentIniFile = new CharacterIni(selectedIniFile);
+                    buttonsAdapter.setButtons(currentIniFile.getButtons());
+                    buttonsAdapter.notifyDataSetChanged();
                 } catch (IOException e) {
                     log.error("IniSelectSpinner onItemSelected: ", e);
                 }
@@ -253,33 +256,45 @@ public class SceneFragment extends Fragment {
         this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
 
         this.positionButton = view.findViewById(R.id.position_button);
-        this.positionButton.setImageBitmap(design.getPositionToBitmapMap().get(state.getPosition()));
+        Glide.with(this)
+                .load(design.getPositionToFileMap().get(state.getPosition()))
+                .into(positionButton);
         this.positionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SpritePosition newPosition = state.getPosition().nextPosition();
                 state.setPosition(newPosition);
-                positionButton.setImageBitmap(design.getPositionToBitmapMap().get(newPosition));
+                Glide.with(SceneFragment.this)
+                        .load(design.getPositionToFileMap().get(newPosition))
+                        .into(positionButton);
             }
         });
         this.flipButton = view.findViewById(R.id.flip_button);
-        this.flipButton.setImageBitmap(design.getFlipToBitmapMap().get(state.getFlip()));
+        Glide.with(this)
+                .load(design.getFlipToFileMap().get(state.getFlip()))
+                .into(flipButton);
         this.flipButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SpriteFlip newFlip = state.getFlip().nextFlip();
                 state.setFlip(newFlip);
-                flipButton.setImageBitmap(design.getFlipToBitmapMap().get(newFlip));
+                Glide.with(SceneFragment.this)
+                        .load(design.getFlipToFileMap().get(newFlip))
+                        .into(flipButton);
             }
         });
 
         this.sfxButton = view.findViewById(R.id.sfx_button);
-        this.sfxButton.setImageBitmap(design.getSfxButtons()[sfxSelected ? 1 : 0]);
+        Glide.with(this)
+                .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
+                .into(sfxButton);
         this.sfxButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sfxSelected = !sfxSelected;
-                sfxButton.setImageBitmap(design.getSfxButtons()[sfxSelected ? 1 : 0]);
+                Glide.with(SceneFragment.this)
+                        .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
+                        .into(sfxButton);
             }
         });
 

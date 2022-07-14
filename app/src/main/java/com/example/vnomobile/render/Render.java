@@ -1,5 +1,6 @@
 package com.example.vnomobile.render;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -8,6 +9,9 @@ import android.os.Build;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.view.View;
+
+import com.example.vnomobile.util.FileUtil;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +24,8 @@ public class Render {
     private static final float SPACING_ADDITION = 0;
     private static final boolean INCLUDE_SPACING = false;
 
+
+    private final View view;
 
     private final int boxNameXOffset;
     private final int boxNameYOffset;
@@ -35,7 +41,8 @@ public class Render {
         antiAliasPaint.setAntiAlias(true);
         antiAliasPaint.setFilterBitmap(true);
         Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
-        canvas.drawBitmap(model.getBackground(), null, canvasRect, antiAliasPaint);
+        Bitmap backgrouundBitmap = FileUtil.loadBitmapFromFile(view, model.getBackgroundFile());
+        canvas.drawBitmap(backgrouundBitmap, null, canvasRect, antiAliasPaint);
         for(RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
             int offset = canvas.getWidth() / 4;
             switch (spriteInfo.getPosition()) {
@@ -47,14 +54,16 @@ public class Render {
                     offset = 0;
             }
             Rect spriteRect = new Rect(offset, 0, canvas.getWidth() + offset, canvas.getHeight());
-            canvas.drawBitmap(spriteInfo.getSpriteBitmap(), null, spriteRect, antiAliasPaint);
+            Bitmap spriteBitmap = FileUtil.loadBitmapFromFile(view, spriteInfo.getSpriteFile());
+            canvas.drawBitmap(spriteBitmap, null, spriteRect, antiAliasPaint);
         }
         if(model.getText().trim().isEmpty()) {
             return;
         }
-        int boxHeight = canvas.getHeight() * model.getTextBox().getHeight() / model.getBackground().getHeight();
+        Bitmap textBoxBitmap = FileUtil.loadBitmapFromFile(view, model.getTextBoxFile());
+        int boxHeight = canvas.getHeight() * textBoxBitmap.getHeight() / backgrouundBitmap.getHeight();
         Rect boxRect = new Rect(0, canvas.getHeight() - boxHeight, canvas.getWidth(), canvas.getHeight());
-        canvas.drawBitmap(model.getTextBox(), null, boxRect, antiAliasPaint);
+        canvas.drawBitmap(textBoxBitmap, null, boxRect, antiAliasPaint);
 
         TextPaint textBoxPaint = new TextPaint();
         textBoxPaint.setAntiAlias(true);

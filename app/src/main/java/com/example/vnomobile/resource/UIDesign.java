@@ -1,8 +1,5 @@
 package com.example.vnomobile.resource;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.util.FileUtil;
@@ -19,24 +16,25 @@ import lombok.Getter;
 public class UIDesign {
 
     private final File designDirectory;
-    private final EnumMap<SpritePosition, Bitmap> positionToBitmapMap;
-    private final EnumMap<SpriteFlip, Bitmap> flipToBitmapMap;
-    private final Bitmap[] sfxButtons;
-    private final Bitmap[] emoteSelectBitmaps;
-//    private final Bitmap arrow;
-    private final Bitmap backdrop;
-    private final Bitmap chatBox;
+    private final EnumMap<SpritePosition, File> positionToFileMap;
+    private final EnumMap<SpriteFlip, File> flipToFileMap;
+    private final File[] sfxButtonsFiles;
+    private final File[] emoteSelectFiles;
+    private final File arrowFile;
+    private final File backdropFile;
+    private final File chatBoxFile;
     private final Wini settings;
 
     public UIDesign(File designDirectory) {
         Wini settings1;
         this.designDirectory = designDirectory;
-        this.positionToBitmapMap = createPositionToButtonBitmapMap(designDirectory);
-        this.flipToBitmapMap = createFlipToButtonBitmapMap(designDirectory);
-        this.sfxButtons = retrieveSfxButtons(designDirectory);
-        this.emoteSelectBitmaps = retrieveEmoteSelectBitmaps(designDirectory);
-        this.backdrop = retrieveBackdrop(designDirectory);
-        this.chatBox = retrieveChatBox(designDirectory);
+        this.positionToFileMap = createPositionToButtonFileMap(designDirectory);
+        this.flipToFileMap = createFlipToButtonFileMap(designDirectory);
+        this.sfxButtonsFiles = retrieveSfxButtonsFiles(designDirectory);
+        this.emoteSelectFiles = retrieveEmoteSelectFiles(designDirectory);
+        this.arrowFile = retrieveArrowFile(designDirectory);
+        this.backdropFile = retrieveBackdropFile(designDirectory);
+        this.chatBoxFile = retrieveChatBoxFile(designDirectory);
         try {
             settings1 = parseSettings(designDirectory);
         } catch (IOException e) {
@@ -46,73 +44,65 @@ public class UIDesign {
         this.settings = settings1;
     }
 
-    private static EnumMap<SpritePosition, Bitmap> createPositionToButtonBitmapMap(File designDirectory) {
+    private static EnumMap<SpritePosition, File> createPositionToButtonFileMap(File designDirectory) {
         File UIButtonsDirectory = FileUtil.getCaseInsensitiveSubFile(designDirectory, "buttons");
-        EnumMap<SpritePosition, Bitmap> map = new EnumMap<>(SpritePosition.class);
+        EnumMap<SpritePosition, File> map = new EnumMap<>(SpritePosition.class);
         File leftFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "side");
         File centerFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "side_mid");
         File rightFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "side_on");
 
         // TODO : add checks if any of this files exist and replace with some default bitmaps maybe
-        map.put(SpritePosition.LEFT, BitmapFactory.decodeFile(leftFile.getPath()));
-        map.put(SpritePosition.CENTER, BitmapFactory.decodeFile(centerFile.getPath()));
-        map.put(SpritePosition.RIGHT, BitmapFactory.decodeFile(rightFile.getPath()));
+        map.put(SpritePosition.LEFT, leftFile);
+        map.put(SpritePosition.CENTER, centerFile);
+        map.put(SpritePosition.RIGHT, rightFile);
         return map;
     }
 
-    private static EnumMap<SpriteFlip, Bitmap> createFlipToButtonBitmapMap(File designDirectory) {
-        EnumMap<SpriteFlip, Bitmap> map = new EnumMap<>(SpriteFlip.class);
+    private static EnumMap<SpriteFlip, File> createFlipToButtonFileMap(File designDirectory) {
+        EnumMap<SpriteFlip, File> map = new EnumMap<>(SpriteFlip.class);
         File UIButtonsDirectory = FileUtil.getCaseInsensitiveSubFile(designDirectory, "buttons");
         File noFlipFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "mirror");
         File flipFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "mirror_on");
 
-        map.put(SpriteFlip.NOFLIP, BitmapFactory.decodeFile(noFlipFile.getPath()));
-        map.put(SpriteFlip.FLIP, BitmapFactory.decodeFile(flipFile.getPath()));
+        map.put(SpriteFlip.NOFLIP, noFlipFile);
+        map.put(SpriteFlip.FLIP, flipFile);
         return map;
     }
 
-    private static Bitmap[] retrieveSfxButtons(File designDirectory) {
-        Bitmap[] bitmaps = new Bitmap[2];
+    private static File[] retrieveSfxButtonsFiles(File designDirectory) {
+        File[] files = new File[2];
         File UIButtonsDirectory = FileUtil.getCaseInsensitiveSubFile(designDirectory, "buttons");
         File sfxOnFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "sfx_on");
         File sfxOffFile = FileUtil.getCaseInsensitiveSubFileDropExtension(UIButtonsDirectory, "sfx_off");
 
-        bitmaps[0] = BitmapFactory.decodeFile(sfxOffFile.getPath());
-        bitmaps[1] = BitmapFactory.decodeFile(sfxOnFile.getPath());
+        files[0] = sfxOffFile;
+        files[1] = sfxOnFile;
 
-        return bitmaps;
+        return files;
     }
 
-    private static Bitmap[] retrieveEmoteSelectBitmaps(File designDirectory) {
-        Bitmap[] bitmaps = new Bitmap[2];
+    private static File[] retrieveEmoteSelectFiles(File designDirectory) {
+        File[] files = new File[2];
         File emoteSelectedFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "emoteselected");
         File emoteUnselectedFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "emoteunselected");
 
-        bitmaps[0] = BitmapFactory.decodeFile(emoteUnselectedFile.getPath());
-        bitmaps[1] = BitmapFactory.decodeFile(emoteSelectedFile.getPath());
+        files[0] = emoteUnselectedFile;
+        files[1] = emoteSelectedFile;
 
-        return bitmaps;
+        return files;
     }
 
     // TODO: arrow is a gif, so we need to think this
-    private static Bitmap retrieveArrow(File designDirectory) {
-        return null;
+    private static File retrieveArrowFile(File designDirectory) {
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "arrow");
     }
 
-    private static Bitmap retrieveBackdrop(File designDirectory) {
-        File backdropFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "backdrop");
-        if(backdropFile == null) {
-            return null;
-        }
-        return BitmapFactory.decodeFile(backdropFile.getPath());
+    private static File retrieveBackdropFile(File designDirectory) {
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "backdrop");
     }
 
-    private static Bitmap retrieveChatBox(File designDirectory) {
-        File chatboxFile = FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "chat");
-        if(chatboxFile == null) {
-            return null;
-        }
-        return BitmapFactory.decodeFile(chatboxFile.getPath());
+    private static File retrieveChatBoxFile(File designDirectory) {
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(designDirectory, "chat");
     }
 
     private static Wini parseSettings(File designDirectory) throws IOException {
