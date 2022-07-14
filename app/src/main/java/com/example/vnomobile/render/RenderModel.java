@@ -24,6 +24,7 @@ public class RenderModel {
         }
     }
 
+    @Setter
     private RenderState state;
 
     private File backgroundFile;

@@ -1,7 +1,6 @@
 package com.example.vnomobile.resource;
 
 import android.media.AudioAttributes;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 
@@ -101,14 +100,12 @@ public class SoundHandler {
             }
             mediaPlayer.reset();
             mediaPlayer.setDataSource(musicFile.getPath());
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mediaPlayer.setLooping(isLooping);
             mediaPlayer.prepareAsync();
         } catch (IOException e) {
             log.error("While trying to play {}: ", trackName, e);
             return;
         }
-        mediaPlayer.start();
     }
 
     public void shutUp() {

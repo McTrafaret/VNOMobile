@@ -1,5 +1,6 @@
 package com.example.vnomobile.render;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,8 +15,10 @@ import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.SoundHandler;
 import com.example.vnomobile.resource.Sprite;
 import com.example.vnomobile.resource.UIDesign;
+import com.example.vnomobile.util.GifUtil;
 import com.example.vnomobile.util.UIUtil;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,14 +86,21 @@ public class Engine {
                         if (modelChanged) {
                             modelChanged = false;
                             lastShownLetterIndex = 0;
+                            render.resetArrowFrame();
                         }
-                        if (lastShownLetterIndex <= currentMessage.length() - 1) {
+                        if (!currentModelWithoutMessage.getState().equals(RenderState.ONLY_BACKGROUND) &&
+                                lastShownLetterIndex <= currentMessage.length() - 1) {
                             if(!Character.isSpaceChar(currentMessage.charAt(lastShownLetterIndex))) {
                                 soundHandler.playBleep(bleepName);
                             }
                             currentModelWithoutMessage.setText(currentMessage.substring(0,
                                     lastShownLetterIndex + 1));
                             lastShownLetterIndex += 1;
+                        }
+                        else {
+                            if(currentModelWithoutMessage.getState().equals(RenderState.NO_ARROW)) {
+                                currentModelWithoutMessage.setState(RenderState.FULL);
+                            }
                         }
                         render.draw(canvas, currentModelWithoutMessage);
                     }
@@ -137,12 +147,21 @@ public class Engine {
 
         this.dataDirectory = dataDirectory;
         this.design = design;
+        Bitmap[] arrowFrames = null;
+        try {
+            arrowFrames = GifUtil.decodeGifIntoBitmapArray(design.getArrowFile());
+        } catch (IOException e) {
+            log.error("Failed to decode arrow.gif");
+        }
         this.render = Render.builder()
                 .view(surfaceView)
                 .boxNameXOffset(30)
                 .boxNameYOffset(440)
                 .textXOffset(30)
                 .textYOffset(480)
+                .arrowXOffset(1000)
+                .arrowYOffset(570)
+                .arrowGifSequence(arrowFrames)
                 .boxNameFontSize(40)
                 .textFontSize(35)
                 .build();
@@ -214,6 +233,7 @@ public class Engine {
             this.bleepName = bleepName;
             currentMessage = command.getMessage();
             currentModelWithoutMessage = RenderModel.builder()
+                    .state(RenderState.NO_ARROW)
                     .boxName(nameToShow)
                     .text(command.getMessage())
                     .textColor(surfaceView.getResources().getColor(UIUtil.getColorId(command.getMessageColor())))
@@ -222,6 +242,20 @@ public class Engine {
                     .spriteDrawInfo(infoList)
                     .build();
 
+            modelChanged = true;
+        }
+
+        synchronized (this) {
+            notifyAll();
+        }
+    }
+
+    public void showBackground(String backgroundName) {
+        synchronized (modelLock) {
+            currentModelWithoutMessage = RenderModel.builder()
+                    .state(RenderState.ONLY_BACKGROUND)
+                    .backgroundFile(dataDirectory.getBackgroundFile(backgroundName))
+                    .build();
             modelChanged = true;
         }
 
