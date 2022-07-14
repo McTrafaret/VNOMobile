@@ -24,6 +24,8 @@ public class RenderModel {
         }
     }
 
+    private RenderState state;
+
     private File backgroundFile;
     private File textBoxFile;
     private List<SpriteDrawInfo>  spriteDrawInfo;

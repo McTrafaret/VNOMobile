@@ -11,7 +11,10 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.View;
 
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.example.vnomobile.util.FileUtil;
+
+import java.io.File;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,8 @@ public class Render {
 
     private final View view;
 
+    private final GifDrawable arrowGif;
+
     private final int boxNameXOffset;
     private final int boxNameYOffset;
     private final int boxNameFontSize;
@@ -35,6 +40,15 @@ public class Render {
     private final int textYOffset;
     private final int textFontSize;
 
+    private final int arrowXOffset;
+    private final int arrowYOffset;
+
+    private int arrowFrame = 0;
+
+
+    public void nextArrowFrame() {
+        arrowFrame = (arrowFrame + 1) % arrowGif.getFrameCount();
+    }
 
     public void draw(Canvas canvas, RenderModel model) {
         Paint antiAliasPaint = new Paint();
