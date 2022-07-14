@@ -21,12 +21,8 @@ public class SoundHandler {
     private MediaPlayer mediaPlayer;
     private DataDirectory dataDirectory;
 
-    //private Integer bleepStreamId = null;
-    private Integer musicStreamId = null;
-
-    private boolean loopMusic = false;
-
-    private Integer currentMusicId = null;
+    private Integer bleepStreamId = null;
+    private Integer sfxStreamId = null;
 
 
     Map<String, Integer> bleepMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -75,7 +71,7 @@ public class SoundHandler {
     public void playBleep(String bleepName) {
         if (bleepMap.containsKey(bleepName)) {
             int bleepId = bleepMap.get(bleepName);
-            soundPool.play(bleepId, 1, 1, 1, 0, 1);
+            bleepStreamId = soundPool.play(bleepId, 1, 1, 1, 0, 1);
             return;
         }
         log.warn("Can't find bleep with name {}", bleepName);
@@ -84,7 +80,7 @@ public class SoundHandler {
     public void playSfx(String sfxName) {
         if (sfxMap.containsKey(sfxName)) {
             int sfxId = sfxMap.get(sfxName);
-            soundPool.play(sfxId, 1, 1, 1, 0, 1);
+            sfxStreamId = soundPool.play(sfxId, 1, 1, 1, 0, 1);
             return;
         }
         log.warn("Cant' find sfx with name {}", sfxName);
@@ -100,7 +96,9 @@ public class SoundHandler {
             return;
         }
         try {
-            mediaPlayer.stop();
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
             mediaPlayer.reset();
             mediaPlayer.setDataSource(musicFile.getPath());
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -111,5 +109,13 @@ public class SoundHandler {
             return;
         }
         mediaPlayer.start();
+    }
+
+    public void shutUp() {
+        if(mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        soundPool.stop(bleepStreamId);
+        soundPool.stop(sfxStreamId);
     }
 }

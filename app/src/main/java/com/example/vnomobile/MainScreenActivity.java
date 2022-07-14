@@ -36,6 +36,7 @@ public class MainScreenActivity extends AppCompatActivity {
         FragmentStateAdapter adapter = new MainScreenPagerAdapter(this);
         this.pager.setAdapter(adapter);
         this.pager.setUserInputEnabled(false);
+        this.pager.setOffscreenPageLimit(4);
         this.tabLayout = findViewById(R.id.main_screen_tabs);
         new TabLayoutMediator(tabLayout, pager, ((tab, position) -> {
             if(position == OOC_TAB_POSITION) {

@@ -30,6 +30,7 @@ import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.CharacterState;
 import com.example.vnolib.command.servercommands.MSCommand;
+import com.example.vnolib.command.servercommands.ROOKCommand;
 import com.example.vnolib.command.servercommands.enums.MessageColor;
 import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
@@ -41,6 +42,7 @@ import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.CharacterIni;
 import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
+import com.example.vnomobile.resource.SoundHandler;
 import com.example.vnomobile.resource.UIDesign;
 import com.example.vnomobile.util.UIUtil;
 
@@ -74,6 +76,7 @@ public class SceneFragment extends Fragment {
     private CharacterIni currentIniFile;
 
     private String[] backgroundNames;
+    private ArrayAdapter<String> backgroundAdapter;
 
     private Wini settings;
     private UIDesign design;
@@ -81,6 +84,13 @@ public class SceneFragment extends Fragment {
     private Engine sceneHandlerEngine;
 
     private boolean sfxSelected = false;
+
+    @OnCommand(ROOKCommand.class)
+    public void onAreaChanged(ROOKCommand command) {
+        this.backgroundNames = dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern());
+        this.backgroundAdapter.clear();
+        this.backgroundAdapter.addAll(backgroundNames);
+    }
 
     @OnCommand(MSCommand.class)
     public void onICMessage(MSCommand command) {
@@ -154,6 +164,7 @@ public class SceneFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        log.debug("ON CREATED");
         this.client = ClientHandler.getClient();
         this.state = new CharacterState();
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
@@ -211,7 +222,7 @@ public class SceneFragment extends Fragment {
 
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
 
-        ArrayAdapter<String> backgroundAdapter = new ArrayAdapter<String>(getContext(),
+        this.backgroundAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
                 backgroundNames);
 
