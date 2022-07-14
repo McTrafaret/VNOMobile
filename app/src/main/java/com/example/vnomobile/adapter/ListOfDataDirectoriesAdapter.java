@@ -1,9 +1,6 @@
 package com.example.vnomobile.adapter;
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,16 +8,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.vnomobile.R;
 import com.example.vnomobile.resource.DataDirectoriesRepository;
 import com.example.vnomobile.resource.DataDirectory;
-import com.example.vnomobile.util.FileUtil;
-
-import java.io.File;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,11 +68,10 @@ public class ListOfDataDirectoriesAdapter extends RecyclerView.Adapter<ListOfDat
 
         public void bind(DataDirectory directory) {
             this.directory = directory;
-            Bitmap bitmap = directory.getMobileIcon();
-            if(bitmap == null) {
-                bitmap = BitmapFactory.decodeResource(resources, R.drawable.vno_icon);
-            }
-            dataDirectoryIcon.setImageBitmap(bitmap);
+            Glide.with(dataDirectoryIcon)
+                    .load(directory.getMobileIconFile())
+                    .error(R.drawable.vno_icon)
+                    .into(dataDirectoryIcon);
             dataDirectoryPath.setText(directory.getPath());
             clientName.setText(directory.getName());
         }

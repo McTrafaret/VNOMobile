@@ -1,14 +1,7 @@
 package com.example.vnomobile.resource;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.AudioManager;
-import android.media.SoundPool;
-
 import com.example.vnolib.client.model.Character;
 import com.example.vnolib.client.model.Server;
-import com.example.vnolib.command.servercommands.enums.SpriteFlip;
-import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.exception.ResourceNotFoundException;
 import com.example.vnomobile.util.FileUtil;
 
@@ -16,15 +9,13 @@ import org.ini4j.Wini;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumMap;
+import java.util.Comparator;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -48,13 +39,9 @@ public class DataDirectory {
         this.name = files[files.length - 1];
     }
 
-    public Bitmap getMobileIcon() {
-        File mobileIconFile = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/UI" +
+    public File getMobileIconFile() {
+        return FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/UI" +
                 "/mobile_icon.png");
-        if (mobileIconFile != null && mobileIconFile.exists()) {
-            return BitmapFactory.decodeFile(mobileIconFile.getPath());
-        }
-        return null;
     }
 
     public List<RosterImage> getRosterImages() throws ResourceNotFoundException {
@@ -64,45 +51,46 @@ public class DataDirectory {
             throw new ResourceNotFoundException("data/misc/RosterImage directory not found");
         }
         List<RosterImage> rosterImages = new ArrayList<>();
-        String[] rosterImagesFileNames = rosterImageDirectory.list();
-        if (rosterImagesFileNames == null) {
+        File[] rosterImagesFiles = rosterImageDirectory.listFiles();
+        if (rosterImagesFiles == null) {
             throw new ResourceNotFoundException("No RosterImages found in " +
                     "\"data/misc/RosterImage\"");
         }
-        Arrays.sort(rosterImagesFileNames);
+        Arrays.sort(rosterImagesFiles, new Comparator<File>() {
+            @Override
+            public int compare(File o1, File o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
         int i = 0;
-        while (i < rosterImagesFileNames.length) {
-            String offFileName = rosterImagesFileNames[i];
-            Bitmap offIcon =
-                    BitmapFactory.decodeFile(rosterImageDirectory.getPath() + File.separator + offFileName);
-            String characterName = offFileName.split("_")[0];
-            Bitmap onIcon = null;
-            if (rosterImagesFileNames[i + 1].startsWith(characterName)) {
-                String onFileName = rosterImagesFileNames[i + 1];
-                onIcon =
-                        BitmapFactory.decodeFile(rosterImageDirectory.getPath() + File.separator + onFileName);
+        while (i < rosterImagesFiles.length) {
+            File offIconFile = rosterImagesFiles[i];
+            String characterName = offIconFile.getName().split("_")[0];
+            File onIconFile = null;
+            if (rosterImagesFiles[i + 1].getName().startsWith(characterName)) {
+                onIconFile = rosterImagesFiles[i + 1];
                 i++;
             }
-            rosterImages.add(new RosterImage(characterName, onIcon, offIcon));
+            rosterImages.add(new RosterImage(characterName, onIconFile, offIconFile));
             i++;
         }
 
         return rosterImages;
     }
 
-    public Bitmap getBigArt(Character character) throws ResourceNotFoundException {
+    public File getBigArtFile(Character character) throws ResourceNotFoundException {
         File bigArtDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/misc" +
                 "/BigArt");
         if (!bigArtDirectory.exists() || !bigArtDirectory.isDirectory()) {
             throw new ResourceNotFoundException("data/misc/BigArt directory not found");
         }
-        String[] bigArtFileNames = bigArtDirectory.list();
-        if (bigArtFileNames == null) {
+        File[] bigArtFiles = bigArtDirectory.listFiles();
+        if (bigArtFiles == null) {
             return null;
         }
-        for (String filename : bigArtFileNames) {
-            if (filename.toUpperCase().startsWith(character.getCharName().toUpperCase())) {
-                return BitmapFactory.decodeFile(bigArtDirectory.getPath() + File.separator + filename);
+        for (File file : bigArtFiles) {
+            if (file.getName().toUpperCase().startsWith(character.getCharName().toUpperCase())) {
+                return file;
             }
         }
 
@@ -189,18 +177,13 @@ public class DataDirectory {
         return backgroundsNames;
     }
 
-    public Bitmap getBackground(String backgroundName) {
+    public File getBackgroundFile(String backgroundName) {
         String pathToBackground = String.format("data/background/%s", backgroundName);
         File backgroundFile = FileUtil.getCaseInsensitiveSubFile(directoryFile, pathToBackground);
         if(backgroundFile != null) {
-            return BitmapFactory.decodeFile(backgroundFile.getPath());
+            return backgroundFile;
         }
-        backgroundFile = FileUtil.getCaseInsensitiveSubFileDropExtension(directoryFile, pathToBackground);
-        if (backgroundFile == null) {
-            return null;
-        }
-
-        return BitmapFactory.decodeFile(backgroundFile.getPath());
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(directoryFile, pathToBackground);
     }
 
     public File[] getBleeps() {

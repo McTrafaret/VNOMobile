@@ -1,8 +1,6 @@
 package com.example.vnomobile.render;
 
 import android.graphics.Canvas;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -18,7 +16,6 @@ import com.example.vnomobile.resource.Sprite;
 import com.example.vnomobile.resource.UIDesign;
 import com.example.vnomobile.util.UIUtil;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +24,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Engine {
 
     private static final int TEXT_SPEED = 20;
@@ -139,6 +138,7 @@ public class Engine {
         this.dataDirectory = dataDirectory;
         this.design = design;
         this.render = Render.builder()
+                .view(surfaceView)
                 .boxNameXOffset(30)
                 .boxNameYOffset(440)
                 .textXOffset(30)
@@ -193,17 +193,18 @@ public class Engine {
 
         List<RenderModel.SpriteDrawInfo> infoList = new LinkedList<>();
         if (command.getPosition().equals(SpritePosition.CENTER)) {
-            infoList.add(new RenderModel.SpriteDrawInfo(sprite.getSpriteBitmap(),
+
+            infoList.add(new RenderModel.SpriteDrawInfo(sprite.getSpriteFile(),
                     SpritePosition.CENTER));
         } else {
             Sprite left = positions.getLeftSprite();
             Sprite right = positions.getRightSprite();
             if (left != null) {
-                infoList.add(new RenderModel.SpriteDrawInfo(left.getSpriteBitmap(),
+                infoList.add(new RenderModel.SpriteDrawInfo(left.getSpriteFile(),
                         SpritePosition.LEFT));
             }
             if (right != null) {
-                infoList.add(new RenderModel.SpriteDrawInfo(right.getSpriteBitmap(),
+                infoList.add(new RenderModel.SpriteDrawInfo(right.getSpriteFile(),
                         SpritePosition.RIGHT));
             }
         }
@@ -216,8 +217,8 @@ public class Engine {
                     .boxName(nameToShow)
                     .text(command.getMessage())
                     .textColor(surfaceView.getResources().getColor(UIUtil.getColorId(command.getMessageColor())))
-                    .textBox(design.getChatBox())
-                    .background(dataDirectory.getBackground(command.getBackgroundImageName()))
+                    .textBoxFile(design.getChatBoxFile())
+                    .backgroundFile(dataDirectory.getBackgroundFile(command.getBackgroundImageName()))
                     .spriteDrawInfo(infoList)
                     .build();
 

@@ -1,7 +1,6 @@
 package com.example.vnomobile.adapter;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.view.LayoutInflater;
@@ -12,16 +11,23 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.vnolib.client.model.CharacterState;
 import com.example.vnomobile.R;
 import com.example.vnomobile.resource.CharacterButton;
 import com.example.vnomobile.resource.UIDesign;
+import com.example.vnomobile.util.FileUtil;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdapter.ListOfSpriteViewHolder> {
 
+    @Setter
     private CharacterButton[] buttons;
     private CharacterState state;
     private UIDesign design;
@@ -66,8 +72,25 @@ public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdap
         public void bind(CharacterButton button, boolean selected) {
             this.characterButton = button;
             log.debug("Selected: {}", selected);
-            Bitmap selectedBackground = design.getEmoteSelectBitmaps()[selected ? 1 : 0];
-            this.spriteButtonImage.setImageBitmap(mergeTwoBitmaps(selectedBackground, characterButton.getButtonBitmap()));
+            Callable<Bitmap> callable = new Callable<Bitmap>() {
+                @Override
+                public Bitmap call() throws Exception {
+                    Bitmap selectedBackground =
+                            FileUtil.loadBitmapFromFile(spriteButtonImage, design.getEmoteSelectFiles()[selected ? 1 : 0]);
+                    Bitmap characterButtonBitmap =
+                            FileUtil.loadBitmapFromFile(spriteButtonImage, characterButton.getButtonFile());
+                    return mergeTwoBitmaps(selectedBackground, characterButtonBitmap);
+                }
+            };
+            FutureTask<Bitmap> futureTask = new FutureTask<>(callable);
+            new Thread(futureTask).start();
+            try {
+                spriteButtonImage.setImageBitmap(futureTask.get());
+            } catch (Exception ex) {
+                Glide.with(spriteButtonImage)
+                        .load(R.drawable.saul_icon)
+                        .into(spriteButtonImage);
+            }
         }
 
 

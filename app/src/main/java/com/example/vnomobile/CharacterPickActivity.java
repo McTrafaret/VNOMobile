@@ -1,10 +1,6 @@
 package com.example.vnomobile;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.bumptech.glide.Glide;
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.Character;
@@ -74,16 +73,14 @@ public class CharacterPickActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedCharacter = client.getCharacterByIndex(position);
-                Bitmap bigArt = null;
                 try {
-                    bigArt = dataDirectory.getBigArt(selectedCharacter);
+                    Glide.with(CharacterPickActivity.this)
+                                    .load(dataDirectory.getBigArtFile(selectedCharacter))
+                                    .error(R.drawable.saul_icon)
+                                    .into(bigArtImage);
                 } catch (ResourceNotFoundException e) {
-                    log.warn("Trying to get BigArt: {}", e);
+                    log.error("While setting bigart:", e);
                 }
-                if(bigArt == null) {
-                    bigArt = BitmapFactory.decodeResource(getResources(), R.drawable.saul_icon);
-                }
-                bigArtImage.setImageBitmap(bigArt);
                 characterNameTextView.setText(selectedCharacter.getCharName());
             }
         });

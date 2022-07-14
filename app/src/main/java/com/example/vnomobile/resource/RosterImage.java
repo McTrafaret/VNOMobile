@@ -1,28 +1,28 @@
 package com.example.vnomobile.resource;
 
-import android.graphics.Bitmap;
+import java.io.File;
 
 public class RosterImage {
 
     private String characterName;
-    private Bitmap onIcon;
-    private Bitmap offIcon;
+    private File onIconFile;
+    private File offIconFile;
 
-    public RosterImage(String characterName, Bitmap onIcon, Bitmap offIcon) {
+    public RosterImage(String characterName, File onIconFile, File offIconFile) {
         this.characterName = characterName;
-        this.onIcon = onIcon;
-        this.offIcon = offIcon;
+        this.onIconFile = onIconFile;
+        this.offIconFile = offIconFile;
     }
 
     public String getCharacterName() {
         return characterName;
     }
 
-    public Bitmap getOnIcon() {
-        return onIcon;
+    public File getOnIconFile() {
+        return onIconFile;
     }
 
-    public Bitmap getOffIcon() {
-        return offIcon;
+    public File getOffIconFile() {
+        return offIconFile;
     }
 }

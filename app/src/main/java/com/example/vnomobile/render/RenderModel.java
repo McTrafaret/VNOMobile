@@ -1,9 +1,8 @@
 package com.example.vnomobile.render;
 
-import android.graphics.Bitmap;
-
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
+import java.io.File;
 import java.util.List;
 
 import lombok.Builder;
@@ -16,17 +15,17 @@ public class RenderModel {
 
     @Getter
     public static class SpriteDrawInfo {
-        private Bitmap spriteBitmap;
+        private File spriteFile;
         private SpritePosition position;
 
-        public SpriteDrawInfo(Bitmap spriteBitmap, SpritePosition position) {
-            this.spriteBitmap = spriteBitmap;
+        public SpriteDrawInfo(File spriteFile, SpritePosition position) {
+            this.spriteFile = spriteFile;
             this.position = position;
         }
     }
 
-    private Bitmap background;
-    private Bitmap textBox;
+    private File backgroundFile;
+    private File textBoxFile;
     private List<SpriteDrawInfo>  spriteDrawInfo;
     private String boxName;
     private int textColor;

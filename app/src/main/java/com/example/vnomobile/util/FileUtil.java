@@ -2,23 +2,42 @@ package com.example.vnomobile.util;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
 import android.provider.DocumentsContract;
+import android.view.View;
 
 import androidx.annotation.Nullable;
-import androidx.documentfile.provider.DocumentFile;
+
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public final class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
+
+    public static Bitmap loadBitmapFromFile(View view, File file) {
+        try {
+            return Glide.with(view)
+                    .asBitmap()
+                    .load(file)
+                    .submit()
+                    .get();
+        } catch (Exception ex) {
+            log.error("While loading bitmap:", ex);
+        }
+        return null;
+    }
 
     /**
      * This thing is needed because the original client was created only for Windows.
