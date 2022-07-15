@@ -73,7 +73,7 @@ public class Client {
 
     private boolean isMod = false;
 
-    private Queue<Area> areaChange = new LinkedList<>();
+    private Area areaChange = null;
 
     public Client() {
         state = ClientState.LOGIN;
@@ -327,11 +327,13 @@ public class Client {
     }
 
     public void requestAreaChange(Area area) {
+        this.areaChange = area;
         vnoConnection.sendChangeAreaRequest(area.getLocationId());
     }
 
     public void changeArea() {
-        this.currentArea = areaChange.remove();
+        this.currentArea = areaChange;
+        this.areaChange = null;
     }
 
     public void addServer(Server server) {

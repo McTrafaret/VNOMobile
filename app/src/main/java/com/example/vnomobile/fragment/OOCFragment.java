@@ -20,8 +20,9 @@ import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.StringListAdapter;
 import com.example.vnomobile.resource.LogHandler;
+import com.example.vnomobile.resource.OOCLogListener;
 
-public class OOCFragment extends Fragment {
+public class OOCFragment extends Fragment implements OOCLogListener {
 
     private RecyclerView messageListRecyclerView;
     private EditText messageInput;
@@ -42,17 +43,12 @@ public class OOCFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @OnCommand(CTCommand.class)
-    public void onOOCMessage(CTCommand command) {
-        getActivity().runOnUiThread(updateViewRunnable);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.logHandler = LogHandler.getInstance();
         this.client = ClientHandler.getClient();
-        client.subscribeToCommand(CTCommand.class, this);
+        this.logHandler.subscribeToOOCLog(this);
     }
 
     @Override
@@ -80,5 +76,10 @@ public class OOCFragment extends Fragment {
                 }
             }
         });
+    }
+
+    @Override
+    public void onNewOOCLogEntry() {
+        getActivity().runOnUiThread(updateViewRunnable);
     }
 }

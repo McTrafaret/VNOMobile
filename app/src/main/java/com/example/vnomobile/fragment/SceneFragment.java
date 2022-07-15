@@ -50,6 +50,8 @@ import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -87,9 +89,20 @@ public class SceneFragment extends Fragment {
 
     @OnCommand(ROOKCommand.class)
     public void onAreaChanged(ROOKCommand command) {
-        this.backgroundNames = dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern());
-        this.backgroundAdapter.clear();
-        this.backgroundAdapter.addAll(backgroundNames);
+        backgroundNames = dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern());
+        state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
+        sceneHandlerEngine.clearPositions();
+        sceneHandlerEngine.showBackground(state.getBackgroundName());
+        SoundHandler.getInstance().shutUp();
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                backgroundAdapter.notifyDataSetChanged();
+                backgroundAdapter.clear();
+                backgroundAdapter.addAll(backgroundNames);
+            }
+        });
     }
 
     @OnCommand(MSCommand.class)
@@ -181,7 +194,6 @@ public class SceneFragment extends Fragment {
         }
 
         state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
-        state.setSpriteName("1"); // TODO: take values from characters directory
     }
 
     @Override
@@ -224,7 +236,7 @@ public class SceneFragment extends Fragment {
 
         this.backgroundAdapter = new ArrayAdapter<String>(getContext(),
                 android.R.layout.simple_spinner_item,
-                backgroundNames);
+                new ArrayList<>(Arrays.asList(backgroundNames)));
 
         backgroundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -310,5 +322,8 @@ public class SceneFragment extends Fragment {
         });
 
         this.client.subscribeToCommand(MSCommand.class, this);
+        sceneHandlerEngine.showBackground(state.getBackgroundName());
+
+        this.client.subscribeToCommand(ROOKCommand.class, this);
     }
 }

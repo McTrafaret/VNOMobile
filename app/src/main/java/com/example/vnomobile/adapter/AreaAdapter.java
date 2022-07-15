@@ -53,6 +53,21 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 position == currentAreaIndex);
     }
 
+    public Area getSelectedArea() {
+        if(lastItemSelectedPosition == -1) {
+            return null;
+        }
+        return areas[lastItemSelectedPosition];
+    }
+
+    public void changeCurrentArea(int position) {
+        currentAreaIndex = position;
+    }
+
+    public int getCurrentArea() {
+        return currentAreaIndex;
+    }
+
     @Override
     public int getItemCount() {
         return areas.length;
