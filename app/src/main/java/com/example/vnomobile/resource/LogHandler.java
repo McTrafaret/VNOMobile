@@ -9,7 +9,9 @@ import com.example.vnolib.command.servercommands.MSCommand;
 import com.example.vnomobile.ClientHandler;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,9 @@ public class LogHandler {
     @Getter
     private List<String> icLog = new ArrayList<>();
 
+    private Set<ICLogListener> icListeners = new HashSet<>();
+    private Set<OOCLogListener> oocListeners = new HashSet<>();
+
     private Client client;
     private DataDirectory dataDirectory;
 
@@ -31,6 +36,7 @@ public class LogHandler {
     private void onOOCMessage(CTCommand command) {
         log.info("Added to OOC log");
         oocLog.add(String.format("%s: %s", command.getUsername(), command.getMessage()));
+        notifyNewOOCLogEntry();
     }
 
     @OnCommand(MSCommand.class)
@@ -57,12 +63,14 @@ public class LogHandler {
         }
         String logEntry = String.format("%s: %s", nameToShow, command.getMessage());
         icLog.add(logEntry);
+        notifyNewICLogEntry();
     }
 
     @OnCommand(MCCommand.class)
     private void onMusicCued(MCCommand command) {
         icLog.add(String.format("%s cue'd a music:%n%s", command.getCharacterName(), command.getTrackName()) +
                 (command.getLoopingStatus().isLooping() ? "(looping)" : ""));
+        notifyNewICLogEntry();
     }
 
     private LogHandler() {
@@ -70,6 +78,7 @@ public class LogHandler {
         dataDirectory = ResourceHandler.getInstance().getDirectory();
         client.subscribeToCommand(CTCommand.class, this);
         client.subscribeToCommand(MSCommand.class, this);
+        client.subscribeToCommand(MCCommand.class, this);
     }
 
     public static void create() {
@@ -83,5 +92,34 @@ public class LogHandler {
             instance = new LogHandler();
         }
         return instance;
+    }
+
+    public void subscribeToOOCLog(OOCLogListener listener) {
+        oocListeners.add(listener);
+    }
+
+    public void unsubscribeFromOOCLog(OOCLogListener listener) {
+        oocListeners.remove(listener);
+    }
+
+    public void subscribeToICLog(ICLogListener listener) {
+        icListeners.add(listener);
+    }
+
+    public void unsubscribeFromICLog(ICLogListener listener) {
+        icListeners.remove(listener);
+    }
+
+
+    private void notifyNewOOCLogEntry() {
+        for (OOCLogListener listener : oocListeners) {
+            listener.onNewOOCLogEntry();
+        }
+    }
+
+    private void notifyNewICLogEntry() {
+        for (ICLogListener listener : icListeners) {
+            listener.onNewIcLogEntry();
+        }
     }
 }

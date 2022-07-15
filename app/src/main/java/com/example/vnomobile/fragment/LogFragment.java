@@ -19,13 +19,14 @@ import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.StringListAdapter;
 import com.example.vnomobile.resource.DataDirectory;
+import com.example.vnomobile.resource.ICLogListener;
 import com.example.vnomobile.resource.LogHandler;
 import com.example.vnomobile.resource.ResourceHandler;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class LogFragment extends Fragment {
+public class LogFragment extends Fragment implements ICLogListener {
 
     private RecyclerView recyclerView;
 
@@ -44,24 +45,13 @@ public class LogFragment extends Fragment {
         }
     };
 
-    @OnCommand(MSCommand.class)
-    public void onICMessage(MSCommand command) {
-        getActivity().runOnUiThread(updateViewRunnable);
-    }
-
-    @OnCommand(MCCommand.class)
-    public void onMusicCued(MCCommand command) {
-        getActivity().runOnUiThread(updateViewRunnable);
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = ClientHandler.getClient();
         logHandler = LogHandler.getInstance();
         dataDirectory = ResourceHandler.getInstance().getDirectory();
-        client.subscribeToCommand(MSCommand.class, this);
-        client.subscribeToCommand(MCCommand.class, this);
+        logHandler.subscribeToICLog(this);
     }
 
     @Override
@@ -78,5 +68,10 @@ public class LogFragment extends Fragment {
         StringListAdapter adapter = new StringListAdapter(logHandler.getIcLog());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+    }
+
+    @Override
+    public void onNewIcLogEntry() {
+        getActivity().runOnUiThread(updateViewRunnable);
     }
 }

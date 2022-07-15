@@ -263,4 +263,8 @@ public class Engine {
             notifyAll();
         }
     }
+
+    public void clearPositions() {
+        backgroundToPositionsMap.clear();
+    }
 }

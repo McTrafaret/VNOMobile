@@ -112,7 +112,11 @@ public class SoundHandler {
         if(mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
-        soundPool.stop(bleepStreamId);
-        soundPool.stop(sfxStreamId);
+        if(bleepStreamId != null) {
+            soundPool.stop(bleepStreamId);
+        }
+        if(sfxStreamId != null) {
+            soundPool.stop(sfxStreamId);
+        }
     }
 }

@@ -13,23 +13,50 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.vnolib.client.Client;
+import com.example.vnolib.client.OnCommand;
+import com.example.vnolib.client.model.Area;
+import com.example.vnolib.command.servercommands.ROOKCommand;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.AreaAdapter;
 
 public class AreaFragment extends Fragment {
 
+    private AreaAdapter areaAdapter;
+
     private RecyclerView areaRecyclerView;
     private SearchView searchView;
     private Button goButton;
+
+    private Client client;
+
+    private Area selectedArea = null;
 
     public AreaFragment() {
         // Required empty public constructor
     }
 
+    @OnCommand(ROOKCommand.class)
+    public void onChangeArea(ROOKCommand command) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int currentAreaInAdapter = areaAdapter.getCurrentArea();
+                areaAdapter.changeCurrentArea(selectedArea.getLocationId() - 1);
+                areaAdapter.notifyItemChanged(selectedArea.getLocationId() - 1);
+                areaAdapter.notifyItemChanged(currentAreaInAdapter);
+            }
+        });
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.areaAdapter = new AreaAdapter(ClientHandler.getClient().getAreas());
+        this.client = ClientHandler.getClient();
+        client.subscribeToCommand(ROOKCommand.class, this);
     }
 
     @Override
@@ -44,8 +71,15 @@ public class AreaFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         this.areaRecyclerView = view.findViewById(R.id.area_recycler_view);
         this.areaRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        this.areaRecyclerView.setAdapter(new AreaAdapter(ClientHandler.getClient().getAreas()));
+        this.areaRecyclerView.setAdapter(areaAdapter);
         this.searchView = view.findViewById(R.id.area_search);
         this.goButton = view.findViewById(R.id.area_go_button);
+        goButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedArea = areaAdapter.getSelectedArea();
+                client.requestAreaChange(selectedArea);
+            }
+        });
     }
 }
