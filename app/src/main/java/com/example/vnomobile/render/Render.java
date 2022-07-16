@@ -26,6 +26,13 @@ public class Render {
     private static final float SPACING_ADDITION = 0;
     private static final boolean INCLUDE_SPACING = false;
 
+    private static final int DEFAULT_BOX_NAME_X_OFFSET = 20;
+    private static final int DEFAULT_BOX_NAME_Y_OFFSET = 195;
+    private static final int DEFAULT_TEXT_X_OFFSET = 20;
+    private static final int DEFAULT_TEXT_Y_OFFSET = 210;
+    private static final int DEFAULT_ARROW_X_OFFSET = 430;
+    private static final int DEFAULT_ARROW_Y_OFFSET = 250;
+
 
     private final View view;
 
@@ -86,11 +93,19 @@ public class Render {
         Rect boxRect = new Rect(0, canvas.getHeight() - boxHeight, canvas.getWidth(), canvas.getHeight());
         canvas.drawBitmap(textBoxBitmap, null, boxRect, antiAliasPaint);
 
+        DisplayMetrics metrics = view.getResources().getDisplayMetrics();
+
+        float yScaleRatio = (float) canvas.getHeight() / backgroundBitmap.getHeight();
+        float xScaleRatio = (float) canvas.getWidth() / backgroundBitmap.getWidth();
+        float xOffset, yOffset;
+
         TextPaint textBoxPaint = new TextPaint();
         textBoxPaint.setAntiAlias(true);
         textBoxPaint.setColor(Color.WHITE);
         textBoxPaint.setTextSize(boxNameFontSize);
-        canvas.drawText(model.getBoxName(), boxNameXOffset, boxNameYOffset, textBoxPaint);
+        xOffset = (boxNameXOffset + DEFAULT_BOX_NAME_X_OFFSET) * xScaleRatio;
+        yOffset = (boxNameYOffset + DEFAULT_BOX_NAME_Y_OFFSET) * yScaleRatio;
+        canvas.drawText(model.getBoxName(), xOffset, yOffset, textBoxPaint);
 
         TextPaint textPaint = new TextPaint();
         textPaint.setColor(model.getTextColor());
@@ -98,8 +113,10 @@ public class Render {
         textPaint.setAntiAlias(true);
 
         StaticLayout staticLayout;
+        xOffset = (textXOffset + DEFAULT_TEXT_X_OFFSET) * xScaleRatio;
+        yOffset = (textYOffset + DEFAULT_TEXT_Y_OFFSET) * yScaleRatio;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length(), textPaint, canvas.getWidth() - textXOffset)
+            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length(), textPaint, canvas.getWidth() - (int)xOffset)
                     .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                     .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
                     .setIncludePad(INCLUDE_SPACING)
@@ -109,24 +126,25 @@ public class Render {
         else {
             staticLayout = new StaticLayout(model.getText(),
                     textPaint,
-                    canvas.getWidth() - textXOffset,
+                    canvas.getWidth() - (int)xOffset,
                     Layout.Alignment.ALIGN_NORMAL,
                     SPACING_MULTIPLIER,
                     SPACING_ADDITION,
                     INCLUDE_SPACING);
         }
         canvas.save();
-        canvas.translate(textXOffset, textYOffset);
+        canvas.translate(xOffset, yOffset);
         staticLayout.draw(canvas);
         canvas.restore();
         if(model.getState().equals(RenderState.NO_ARROW) || arrowGifSequence == null) {
             return;
         }
 
-        DisplayMetrics metrics = view.getResources().getDisplayMetrics();
         Matrix matrix = new Matrix();
         matrix.postScale(metrics.scaledDensity, metrics.scaledDensity);
-        matrix.postTranslate(arrowXOffset, arrowYOffset);
+        xOffset = (arrowXOffset + DEFAULT_ARROW_X_OFFSET) * xScaleRatio;
+        yOffset = (arrowYOffset + DEFAULT_ARROW_Y_OFFSET) * yScaleRatio;
+        matrix.postTranslate(xOffset, yOffset);
 
         canvas.drawBitmap(arrowGifSequence[arrowFrame], matrix, antiAliasPaint);
         nextArrowFrame();

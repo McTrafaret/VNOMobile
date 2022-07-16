@@ -18,6 +18,9 @@ import com.example.vnomobile.resource.UIDesign;
 import com.example.vnomobile.util.GifUtil;
 import com.example.vnomobile.util.UIUtil;
 
+import org.ini4j.Profile;
+import org.ini4j.Wini;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -153,14 +156,22 @@ public class Engine {
         } catch (IOException e) {
             log.error("Failed to decode arrow.gif");
         }
+        Wini settings = design.getSettings();
+        Profile.Section placementSection = settings.get("Placement");
+        int boxNameXOffset = Integer.parseInt(placementSection.get("edit_name_leftdiv", "0"));
+        int boxNameYOffset = Integer.parseInt(placementSection.get("edit_name_updiv", "0"));
+        int textXOffset = Integer.parseInt(placementSection.get("memo_textbox_leftdiv", "0"));
+        int textYOffset = Integer.parseInt(placementSection.get("memo_textbox_updiv", "0"));
+        int arrowYOffset = Integer.parseInt(placementSection.get("arrow_updiv", "0"));
+        int arrowXOffset = Integer.parseInt(placementSection.get("arrow_leftdiv", "0"));
         this.render = Render.builder()
                 .view(surfaceView)
-                .boxNameXOffset(30)
-                .boxNameYOffset(440)
-                .textXOffset(30)
-                .textYOffset(480)
-                .arrowXOffset(1000)
-                .arrowYOffset(570)
+                .boxNameXOffset(boxNameXOffset)
+                .boxNameYOffset(boxNameYOffset)
+                .textXOffset(textXOffset)
+                .textYOffset(textYOffset)
+                .arrowXOffset(arrowXOffset)
+                .arrowYOffset(arrowYOffset)
                 .arrowGifSequence(arrowFrames)
                 .boxNameFontSize(40)
                 .textFontSize(35)
