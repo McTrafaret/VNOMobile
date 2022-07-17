@@ -79,6 +79,7 @@ public class SceneFragment extends Fragment {
 
     private String[] backgroundNames;
     private ArrayAdapter<String> backgroundAdapter;
+    private SpriteButtonsAdapter buttonsAdapter;
 
     private Wini settings;
     private UIDesign design;
@@ -211,6 +212,31 @@ public class SceneFragment extends Fragment {
 
         this.sceneHandlerEngine = new Engine(sceneView, dataDirectory, design);
 
+        initSendButton(view);
+        initListOfCharacterButtons(view);
+        initColorSlider(view);
+        initBackgroundSpinner(view);
+        initIniSpinner(view);
+        this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
+        initPositionButton(view);
+        initFlipButton(view);
+        initSfxButton(view);
+
+        this.client.subscribeToCommand(MSCommand.class, this);
+        sceneHandlerEngine.showBackground(state.getBackgroundName());
+
+        this.client.subscribeToCommand(ROOKCommand.class, this);
+    }
+
+    @Override
+    public void onDestroy() {
+        sceneHandlerEngine.stop();
+        client.unsubscribeFromCommand(MSCommand.class, this);
+        client.unsubscribeFromCommand(ROOKCommand.class, this);
+        super.onDestroy();
+    }
+
+    private void initSendButton(View view) {
         this.sendButton = view.findViewById(R.id.send_character_message_button);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -221,17 +247,23 @@ public class SceneFragment extends Fragment {
                 messageInput.setText("");
             }
         });
+    }
 
+    private void initListOfCharacterButtons(View view) {
         this.listOfCharacterButtons = view.findViewById(R.id.list_of_character_buttons);
-        SpriteButtonsAdapter buttonsAdapter = new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state);
+        buttonsAdapter = new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state);
         this.listOfCharacterButtons.setAdapter(buttonsAdapter);
         this.listOfCharacterButtons.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+    }
 
+    private void initColorSlider(View view) {
         this.colorsSlider = view.findViewById(R.id.colors_slider);
         colorsSlider.setMax(6);
         colorsSlider.setProgress(0);
         colorsSlider.setOnSeekBarChangeListener(new ColorSliderListener(state));
+    }
 
+    private void initBackgroundSpinner(View view) {
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
 
         this.backgroundAdapter = new ArrayAdapter<String>(getContext(),
@@ -252,7 +284,9 @@ public class SceneFragment extends Fragment {
 
             }
         });
+    }
 
+    private void initIniSpinner(View view) {
         this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
         FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, characterData.getIniFiles());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -275,9 +309,9 @@ public class SceneFragment extends Fragment {
 
             }
         });
+    }
 
-        this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
-
+    private void initPositionButton(View view) {
         this.positionButton = view.findViewById(R.id.position_button);
         Glide.with(this)
                 .load(design.getPositionToFileMap().get(state.getPosition()))
@@ -292,6 +326,10 @@ public class SceneFragment extends Fragment {
                         .into(positionButton);
             }
         });
+    }
+
+    private void initFlipButton(View view) {
+
         this.flipButton = view.findViewById(R.id.flip_button);
         Glide.with(this)
                 .load(design.getFlipToFileMap().get(state.getFlip()))
@@ -306,7 +344,9 @@ public class SceneFragment extends Fragment {
                         .into(flipButton);
             }
         });
+    }
 
+    private void initSfxButton(View view) {
         this.sfxButton = view.findViewById(R.id.sfx_button);
         Glide.with(this)
                 .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
@@ -321,9 +361,7 @@ public class SceneFragment extends Fragment {
             }
         });
 
-        this.client.subscribeToCommand(MSCommand.class, this);
-        sceneHandlerEngine.showBackground(state.getBackgroundName());
-
-        this.client.subscribeToCommand(ROOKCommand.class, this);
     }
+
+
 }

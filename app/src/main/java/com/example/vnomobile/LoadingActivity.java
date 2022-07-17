@@ -1,11 +1,11 @@
 package com.example.vnomobile;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;

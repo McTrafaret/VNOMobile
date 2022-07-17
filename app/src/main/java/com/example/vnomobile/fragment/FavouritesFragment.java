@@ -43,6 +43,7 @@ public class FavouritesFragment extends Fragment implements OnServerEntryListene
         client.unsubscribeAll();
         LogHandler.create();
         Intent intent = new Intent(getActivity(), LoadingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 

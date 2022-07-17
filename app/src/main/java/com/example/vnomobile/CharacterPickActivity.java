@@ -19,10 +19,14 @@ import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.Character;
 import com.example.vnolib.command.ascommands.NoCommand;
 import com.example.vnolib.command.servercommands.AllowedCommand;
+import com.example.vnolib.command.servercommands.TKNCommand;
+import com.example.vnolib.exception.ConnectionException;
 import com.example.vnomobile.adapter.RosterImageAdapter;
 import com.example.vnomobile.exception.ResourceNotFoundException;
 import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
+
+import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,15 +44,23 @@ public class CharacterPickActivity extends AppCompatActivity {
     private DataDirectory dataDirectory;
     private Client client;
 
-    @OnCommand(NoCommand.class)
-    public void onCharacterNotAllowed(NoCommand command) {
-        Toast.makeText(this, "This character is already in use", Toast.LENGTH_SHORT).show();
+    boolean subscribed = false;
+
+    @OnCommand(TKNCommand.class)
+    public void onCharacterNotAllowed(TKNCommand command) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(CharacterPickActivity.this, "This character is already in use", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @OnCommand(AllowedCommand.class)
     public void onCharacterAllowed(AllowedCommand command) {
         client.unsubscribeFromCommand(AllowedCommand.class, this);
         client.unsubscribeFromCommand(NoCommand.class, this);
+        subscribed = false;
         Intent intent = new Intent(this, MainScreenActivity.class);
         startActivity(intent);
     }
@@ -97,7 +109,29 @@ public class CharacterPickActivity extends AppCompatActivity {
             }
         });
 
-        client.subscribeToCommand(AllowedCommand.class, this);
-        client.subscribeToCommand(NoCommand.class, this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        log.debug("ON START");
+        if(!subscribed) {
+            client.subscribeToCommand(AllowedCommand.class, this);
+            client.subscribeToCommand(TKNCommand.class, this);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        try {
+            client.disconnectFromServer();
+            client.connectToMaster();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ConnectionException e) {
+            e.printStackTrace();
+        }
+        finish();
     }
 }
