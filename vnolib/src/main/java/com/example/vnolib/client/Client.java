@@ -24,9 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -343,26 +341,37 @@ public class Client {
     }
 
     public void connectToMaster() throws ConnectionException, IOException {
-        if (asConnection != null) {
-            throw new ConnectionException(String.format("Already connected to master. Ip: %s", asConnection.getHost()));
+        if(asConnection == null || asConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
+            asConnection = new ASConnection(MASTER_IP, MASTER_PORT, commandsToRead, commandHandler);
+            asConnection.connect();
+            return;
         }
-        asConnection = new ASConnection(MASTER_IP, MASTER_PORT, commandsToRead, commandHandler);
-        asConnection.connect();
+        throw new ConnectionException(String.format("Already connected to master. Ip: %s", asConnection.getHost()));
     }
 
     public void disconnectFromMaster() throws IOException, ConnectionException {
-        if (asConnection == null) {
+        if (asConnection == null || asConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
             throw new ConnectionException("Not connected to master");
         }
         asConnection.disconnect();
+        asConnection = null;
     }
 
     public void connectToServer(Server server) throws ConnectionException, IOException {
-        if (vnoConnection != null) {
-            throw new ConnectionException(String.format("Already connected to server. Server info: %s", vnoConnection.getServer()));
+        if(vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
+            vnoConnection = new VNOConnection(server, commandsToRead, commandHandler);
+            vnoConnection.connect();
+            return;
         }
-        vnoConnection = new VNOConnection(server, commandsToRead, commandHandler);
-        vnoConnection.connect();
+        throw new ConnectionException(String.format("Already connected to server. Server info: %s", vnoConnection.getServer()));
+    }
+
+    public void disconnectFromServer() throws ConnectionException, IOException {
+        if (vnoConnection == null || vnoConnection.getStatus().equals(ConnectionStatus.DISCONNECTED)) {
+            throw new ConnectionException("Not connected to master");
+        }
+        vnoConnection.disconnect();
+        vnoConnection = null;
     }
 
     public void startCommandHandler() {

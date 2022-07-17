@@ -45,6 +45,7 @@ public class ListOfServersFragment extends Fragment implements OnServerEntryList
         client.unsubscribeAll();
         LogHandler.create();
         Intent intent = new Intent(getActivity(), LoadingActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 

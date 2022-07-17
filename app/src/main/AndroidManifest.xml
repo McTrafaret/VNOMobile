@@ -40,7 +40,8 @@
         <activity
             android:name=".ClientDataPickActivity"
             android:screenOrientation="portrait"
-            android:exported="true">
+            android:exported="true"
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,10 +50,6 @@
         </activity>
         <activity
             android:name=".ServersListActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:exported="false" />
         <activity

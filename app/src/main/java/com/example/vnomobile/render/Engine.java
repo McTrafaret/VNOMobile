@@ -75,12 +75,18 @@ public class Engine {
         @Override
         public void run() {
             while (!stopped) {
-                Canvas canvas;
+                Canvas canvas = null;
                 if (surfaceHolder == null || currentModelWithoutMessage == null || (canvas = surfaceHolder.lockCanvas()) == null ) {
                     synchronized (Engine.this) {
+                        if(stopped) {
+                            break;
+                        }
                         try {
                             Engine.this.wait();
                         } catch (InterruptedException e) {
+                            if(stopped) {
+                                break;
+                            }
                             e.printStackTrace();
                         }
                     }
@@ -111,6 +117,9 @@ public class Engine {
                     try {
                         Thread.sleep(TEXT_SPEED);
                     } catch (InterruptedException e) {
+                        if(stopped) {
+                            break;
+                        }
                         e.printStackTrace();
                     }
 
@@ -277,5 +286,18 @@ public class Engine {
 
     public void clearPositions() {
         backgroundToPositionsMap.clear();
+    }
+
+    public void stop() {
+        synchronized (this) {
+            stopped = true;
+            runThread.interrupt();
+            notifyAll();
+        }
+        try {
+            runThread.join();
+        } catch (InterruptedException e) {
+            log.error("While joining drawer thread: ", e);
+        }
     }
 }

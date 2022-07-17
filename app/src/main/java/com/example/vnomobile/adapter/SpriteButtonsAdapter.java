@@ -71,7 +71,6 @@ public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdap
 
         public void bind(CharacterButton button, boolean selected) {
             this.characterButton = button;
-            log.debug("Selected: {}", selected);
             Callable<Bitmap> callable = new Callable<Bitmap>() {
                 @Override
                 public Bitmap call() throws Exception {

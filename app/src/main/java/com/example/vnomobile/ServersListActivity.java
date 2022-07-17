@@ -10,9 +10,6 @@ import com.example.vnomobile.adapter.pager.ListOfServersAndFavouritesAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -34,4 +31,9 @@ public class ServersListActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, pager, ((tab, position) -> {tab.setText(tabTextId[position]);})).attach();
     }
 
+    @Override
+    protected void onResume() {
+        log.debug("ON_RESUME");
+        super.onResume();
+    }
 }

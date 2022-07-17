@@ -12,9 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnolib.client.Client;
-import com.example.vnolib.client.OnCommand;
-import com.example.vnolib.command.servercommands.MCCommand;
-import com.example.vnolib.command.servercommands.MSCommand;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.StringListAdapter;
@@ -73,5 +70,11 @@ public class LogFragment extends Fragment implements ICLogListener {
     @Override
     public void onNewIcLogEntry() {
         getActivity().runOnUiThread(updateViewRunnable);
+    }
+
+    @Override
+    public void onDestroy() {
+        logHandler.unsubscribeFromICLog(this);
+        super.onDestroy();
     }
 }

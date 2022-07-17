@@ -82,4 +82,10 @@ public class AreaFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onDestroy() {
+        client.unsubscribeFromCommand(ROOKCommand.class, this);
+        super.onDestroy();
+    }
 }

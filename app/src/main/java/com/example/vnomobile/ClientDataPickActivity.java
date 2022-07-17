@@ -30,10 +30,7 @@ import com.example.vnomobile.util.FileUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStream;
-import java.util.HashSet;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,7 +75,7 @@ public class ClientDataPickActivity extends AppCompatActivity implements OnDirec
     public void onDirectoryClick(DataDirectory directory) {
         ResourceHandler.getInstance().init(directory);
         Intent intent = new Intent(this, LoginActivity.class);
-//        Intent intent = new Intent(this, TestRendererActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(intent);
     }
 
