@@ -206,7 +206,7 @@ public class DataDirectory {
             return null;
         }
 
-        return FileUtil.getCaseInsensitiveSubFile(sfxDirectory, sfxName);
+        return FileUtil.getCaseInsensitiveSubFileDropExtension(sfxDirectory, sfxName);
     }
 
     public File[] getSfxFiles() {

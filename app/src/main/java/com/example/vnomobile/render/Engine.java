@@ -260,6 +260,8 @@ public class Engine {
 
         synchronized (modelLock) {
             this.bleepName = bleepName;
+            this.sfxName = command.getSfx().isEmpty() ? null : command.getSfx();
+            this.sfxPlayed = false;
             currentMessage = command.getMessage();
             currentModelWithoutMessage = RenderModel.builder()
                     .state(RenderState.NO_ARROW)
