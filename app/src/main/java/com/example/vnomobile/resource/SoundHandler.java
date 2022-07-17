@@ -23,9 +23,10 @@ public class SoundHandler {
     private Integer bleepStreamId = null;
     private Integer sfxStreamId = null;
 
+    private Map<String, Integer> bleepMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private boolean bleepsLoaded = false;
 
-    Map<String, Integer> bleepMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    Map<String, Integer> sfxMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, Integer> sfxMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     private SoundHandler() {
 
@@ -39,6 +40,15 @@ public class SoundHandler {
                 .setMaxStreams(5)
                 .build();
 
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                if(status == 0 && sfxMap.containsValue(sampleId)) {
+                    sfxStreamId = soundPool.play(sampleId, 1, 1, 1, 0, 1);
+                }
+            }
+        });
+
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -49,15 +59,16 @@ public class SoundHandler {
 
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
 
-        for (File file : dataDirectory.getBleeps()) {
-            int bleepId = soundPool.load(file.getPath(), 1);
-            bleepMap.put(file.getName().split("\\.")[0], bleepId);
-        }
-
-        for (File file : dataDirectory.getSfxFiles()) {
-            int sfxId = soundPool.load(file.getPath(), 1);
-            sfxMap.put(file.getName().split("\\.")[0], sfxId);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (File file : dataDirectory.getBleeps()) {
+                    int bleepId = soundPool.load(file.getPath(), 1);
+                    bleepMap.put(file.getName().split("\\.")[0], bleepId);
+                }
+                bleepsLoaded = true;
+            }
+        }).start();
     }
 
     public static SoundHandler getInstance() {
@@ -68,6 +79,9 @@ public class SoundHandler {
     }
 
     public void playBleep(String bleepName) {
+        if(!bleepsLoaded) {
+            return;
+        }
         if (bleepMap.containsKey(bleepName)) {
             int bleepId = bleepMap.get(bleepName);
             bleepStreamId = soundPool.play(bleepId, 1, 1, 1, 0, 1);
@@ -82,7 +96,13 @@ public class SoundHandler {
             sfxStreamId = soundPool.play(sfxId, 1, 1, 1, 0, 1);
             return;
         }
-        log.warn("Cant' find sfx with name {}", sfxName);
+        File sfxFile = dataDirectory.getSfxFile(sfxName);
+        if(sfxFile == null) {
+            log.warn("Cant' find sfx with name {}", sfxName);
+            return;
+        }
+        int sfxId = soundPool.load(sfxFile.getPath(), 1);
+        sfxMap.put(sfxName, sfxId);
     }
 
     public void playMusicTrack(String trackName, boolean isLooping) {

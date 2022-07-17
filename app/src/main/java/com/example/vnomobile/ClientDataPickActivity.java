@@ -75,7 +75,7 @@ public class ClientDataPickActivity extends AppCompatActivity implements OnDirec
     public void onDirectoryClick(DataDirectory directory) {
         ResourceHandler.getInstance().init(directory);
         Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

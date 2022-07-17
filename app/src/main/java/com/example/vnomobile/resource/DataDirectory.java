@@ -199,6 +199,16 @@ public class DataDirectory {
         return FileUtil.getCaseInsensitiveSubFileDropExtension(bleepsDirectory, bleepName);
     }
 
+    public File getSfxFile(String sfxName) {
+        File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +
+                "/sfx");
+        if(sfxDirectory == null) {
+            return null;
+        }
+
+        return FileUtil.getCaseInsensitiveSubFile(sfxDirectory, sfxName);
+    }
+
     public File[] getSfxFiles() {
 
         File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +

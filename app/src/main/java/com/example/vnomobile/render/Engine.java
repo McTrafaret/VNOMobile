@@ -53,6 +53,10 @@ public class Engine {
     private final Lock modelLock = new ReentrantLock();
 
     private String bleepName;
+
+    private String sfxName;
+    private boolean sfxPlayed = false;
+
     private String currentMessage;
     private RenderModel currentModelWithoutMessage;
     private volatile boolean modelChanged = false;
@@ -112,6 +116,11 @@ public class Engine {
                             }
                         }
                         render.draw(canvas, currentModelWithoutMessage);
+                    }
+                    if(sfxName != null && !sfxPlayed) {
+                        soundHandler.playSfx(sfxName);
+                        sfxPlayed = true;
+                        sfxName = null;
                     }
                     surfaceHolder.unlockCanvasAndPost(canvas);
                     try {
