@@ -2,7 +2,6 @@ package com.example.vnomobile;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -32,6 +31,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button identifyButton;
     private Button createAccountButton;
     private CheckBox rememberMeCheckbox;
+
+    private boolean connectedToMaster = false;
 
     private static final String REMEMBER_ME_FILE = "remember_me.txt";
 
@@ -79,7 +80,31 @@ public class LoginActivity extends AppCompatActivity {
     @OnCommand(NoCommand.class)
     public void wrongCredentials(NoCommand command) {
         log.info("Got No");
-        Toast.makeText(this, R.string.wrong_credentials, Toast.LENGTH_SHORT).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, R.string.wrong_credentials, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void onFailedToConnectToMaster() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, R.string.master_connect_failed, Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.continue_without_as, Toast.LENGTH_SHORT).show();
+            }
+        });
+        ClientHandler.getClient().unsubscribeFromCommand(VNALCommand.class, this);
+        ClientHandler.getClient().unsubscribeFromCommand(NoCommand.class, this);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Intent intent = new Intent(LoginActivity.this, ServersListActivity.class);
+        startActivity(intent);
     }
 
 
@@ -88,18 +113,26 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
-        StrictMode.setThreadPolicy(policy);
-
-        try {
-            ClientHandler.getClient().connectToMaster();
-        } catch (Exception ex) {
-            log.error("LoginActivity: ", ex);
-        }
+        //StrictMode.setThreadPolicy(policy);
 
         ClientHandler.getClient().subscribeToCommand(VNALCommand.class, this);
         ClientHandler.getClient().subscribeToCommand(NoCommand.class, this);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ClientHandler.getClient().connectToMaster();
+                    connectedToMaster = true;
+                } catch (Exception ex) {
+                    onFailedToConnectToMaster();
+                    log.error("LoginActivity: ", ex);
+                }
+            }
+        }).start();
+
 
 
 
@@ -114,6 +147,15 @@ public class LoginActivity extends AppCompatActivity {
         identifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!connectedToMaster) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(LoginActivity.this, R.string.not_connected_yet, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    return;
+                }
                 String login = loginInput.getText().toString();
                 String password = passwordInput.getText().toString();
                 try {

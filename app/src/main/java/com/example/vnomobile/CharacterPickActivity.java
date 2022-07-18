@@ -20,13 +20,10 @@ import com.example.vnolib.client.model.Character;
 import com.example.vnolib.command.ascommands.NoCommand;
 import com.example.vnolib.command.servercommands.AllowedCommand;
 import com.example.vnolib.command.servercommands.TKNCommand;
-import com.example.vnolib.exception.ConnectionException;
 import com.example.vnomobile.adapter.RosterImageAdapter;
 import com.example.vnomobile.exception.ResourceNotFoundException;
 import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
-
-import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -114,7 +111,6 @@ public class CharacterPickActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        log.debug("ON START");
         if(!subscribed) {
             client.subscribeToCommand(AllowedCommand.class, this);
             client.subscribeToCommand(TKNCommand.class, this);
@@ -124,14 +120,17 @@ public class CharacterPickActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        try {
-            client.disconnectFromServer();
-            client.connectToMaster();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ConnectionException e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.disconnectFromServer();
+                    client.connectToMaster();
+                } catch (Exception ex) {
+                    log.error("When disconnecting to server and connecting to master: ", ex);
+                }
+            }
+        }).start();
         finish();
     }
 }

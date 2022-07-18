@@ -336,8 +336,17 @@ public class Client {
 
     public void addServer(Server server) {
         synchronized (servers) {
-            servers.add(server.getIndex(), server);
+            if(servers.size() > server.getIndex()) {
+                servers.set(server.getIndex(), server);
+            }
+            else {
+                servers.add(server);
+            }
         }
+    }
+
+    public boolean connectedToMaster() {
+       return asConnection != null && asConnection.getStatus().equals(ConnectionStatus.CONNECTED);
     }
 
     public void connectToMaster() throws ConnectionException, IOException {
@@ -355,6 +364,10 @@ public class Client {
         }
         asConnection.disconnect();
         asConnection = null;
+    }
+
+    public boolean connectedToServer() {
+        return vnoConnection != null && vnoConnection.getStatus().equals(ConnectionStatus.CONNECTED);
     }
 
     public void connectToServer(Server server) throws ConnectionException, IOException {

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,7 +40,7 @@ public class FavouritesFragment extends Fragment implements OnServerEntryListene
     }
 
     @OnCommand(PCCommand.class)
-    private void  connectedToServer(PCCommand command) {
+    private void connectedToServer(PCCommand command) {
         client.unsubscribeAll();
         LogHandler.create();
         Intent intent = new Intent(getActivity(), LoadingActivity.class);
@@ -69,14 +70,35 @@ public class FavouritesFragment extends Fragment implements OnServerEntryListene
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
     }
 
+    public void onConnectToServerFailed() {
+        client.unsubscribeFromCommand(PCCommand.class, this);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(), R.string.server_connect_failed, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void onServerEntryClick(Server server) {
-        try {
-            client.subscribeToCommand(PCCommand.class, this);
-            client.connectToServer(server);
-            client.disconnectFromMaster();
-        } catch (Exception ex) {
-            log.error("Error while connecting to server:", ex);
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    client.subscribeToCommand(PCCommand.class, FavouritesFragment.this);
+                    client.connectToServer(server);
+                } catch (Exception ex) {
+                    log.error("While connecting to server: ", ex);
+                    onConnectToServerFailed();
+                    return;
+                }
+                try {
+                    client.disconnectFromMaster();
+                } catch (Exception ex) {
+                    log.error("Failed to disconnect from master: ", ex);
+                }
+            }
+        }).start();
     }
 }

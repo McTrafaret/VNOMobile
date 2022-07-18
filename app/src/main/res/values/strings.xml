@@ -29,4 +29,9 @@
     <string name="play">Play</string>
     <string name="go">Go</string>
     <string name="you_are_here">You are here</string>
+    <string name="master_connect_failed">Failed to connect to master</string>
+    <string name="continue_without_as">Continuing without AS connection...</string>
+    <string name="not_connected_yet">Not connected yet</string>
+    <string name="server_connect_failed">Failed to connect to server</string>
+    <string name="not_connected_to_master">Not connected to master</string>
 </resources>
