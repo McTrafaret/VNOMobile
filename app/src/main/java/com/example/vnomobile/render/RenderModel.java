@@ -1,5 +1,6 @@
 package com.example.vnomobile.render;
 
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
 import java.io.File;
@@ -17,10 +18,12 @@ public class RenderModel {
     public static class SpriteDrawInfo {
         private File spriteFile;
         private SpritePosition position;
+        private SpriteFlip flip;
 
-        public SpriteDrawInfo(File spriteFile, SpritePosition position) {
+        public SpriteDrawInfo(File spriteFile, SpritePosition position, SpriteFlip flip) {
             this.spriteFile = spriteFile;
             this.position = position;
+            this.flip = flip;
         }
     }
 

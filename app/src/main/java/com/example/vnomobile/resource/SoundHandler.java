@@ -59,7 +59,6 @@ public class SoundHandler {
 
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
 
-        log.debug("started loading thread");
 
         new Thread(new Runnable() {
             @Override
@@ -72,7 +71,6 @@ public class SoundHandler {
             }
         }).start();
 
-        log.debug("after loading thread");
     }
 
     public static SoundHandler getInstance() {
@@ -95,7 +93,6 @@ public class SoundHandler {
     }
 
     public void playSfx(String sfxName) {
-        log.debug("playing sfx {}", sfxName);
         if (sfxMap.containsKey(sfxName)) {
             int sfxId = sfxMap.get(sfxName);
             sfxStreamId = soundPool.play(sfxId, 1, 1, 1, 0, 1);

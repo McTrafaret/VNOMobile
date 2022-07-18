@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.example.vnolib.client.model.BoxName;
 import com.example.vnolib.command.servercommands.MSCommand;
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnolib.command.servercommands.enums.SpritePosition;
 import com.example.vnomobile.resource.CharacterData;
 import com.example.vnomobile.resource.DataDirectory;
@@ -69,7 +70,9 @@ public class Engine {
     @Getter
     private class Positions {
         Sprite leftSprite;
+        SpriteFlip leftSpriteFlip;
         Sprite rightSprite;
+        SpriteFlip rightSpriteFlip;
     }
 
     private class RunThread extends Thread {
@@ -234,26 +237,34 @@ public class Engine {
 
         Positions positions = backgroundToPositionsMap.get(command.getBackgroundImageName());
         if (command.getPosition().equals(SpritePosition.LEFT)) {
+            if(positions.getRightSprite() != null && positions.getRightSprite().getName().equals(sprite.getName())) {
+                positions.setRightSprite(null);
+            }
             positions.setLeftSprite(sprite);
+            positions.setLeftSpriteFlip(command.getFlip());
         } else if (command.getPosition().equals(SpritePosition.RIGHT)) {
+            if(positions.getLeftSprite() != null && positions.getLeftSprite().getName().equals(sprite.getName())) {
+                positions.setLeftSprite(null);
+            }
             positions.setRightSprite(sprite);
+            positions.setRightSpriteFlip(command.getFlip());
         }
 
         List<RenderModel.SpriteDrawInfo> infoList = new LinkedList<>();
         if (command.getPosition().equals(SpritePosition.CENTER)) {
 
             infoList.add(new RenderModel.SpriteDrawInfo(sprite.getSpriteFile(),
-                    SpritePosition.CENTER));
+                    SpritePosition.CENTER, command.getFlip()));
         } else {
             Sprite left = positions.getLeftSprite();
             Sprite right = positions.getRightSprite();
             if (left != null) {
                 infoList.add(new RenderModel.SpriteDrawInfo(left.getSpriteFile(),
-                        SpritePosition.LEFT));
+                        SpritePosition.LEFT, positions.getLeftSpriteFlip()));
             }
             if (right != null) {
                 infoList.add(new RenderModel.SpriteDrawInfo(right.getSpriteFile(),
-                        SpritePosition.RIGHT));
+                        SpritePosition.RIGHT, positions.getRightSpriteFlip()));
             }
         }
 

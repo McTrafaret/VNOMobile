@@ -33,7 +33,6 @@ public class ServersListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        log.debug("ON_RESUME");
         super.onResume();
     }
 }

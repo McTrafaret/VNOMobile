@@ -86,6 +86,7 @@ public class SceneFragment extends Fragment {
 
     private Engine sceneHandlerEngine;
 
+    private String sfxName = "";
     private boolean sfxSelected = false;
     private File[] sfxFiles;
 
@@ -109,6 +110,9 @@ public class SceneFragment extends Fragment {
 
     @OnCommand(MSCommand.class)
     public void onICMessage(MSCommand command) {
+        if(command.getBackgroundImageName() == null || command.getBackgroundImageName().isEmpty()) {
+            command.setBackgroundImageName(client.getCurrentArea().getBackgroundNamePattern());
+        }
         sceneHandlerEngine.handle(command);
     }
 
@@ -179,7 +183,6 @@ public class SceneFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        log.debug("ON CREATED");
         this.client = ClientHandler.getClient();
         this.state = new CharacterState();
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
@@ -190,12 +193,12 @@ public class SceneFragment extends Fragment {
             String designName = settings.get("DesignStyle", "design");
             this.design = dataDirectory.getDesign(designName);
             this.backgroundNames = dataDirectory.getBackgroundNames(client.getCurrentArea().getBackgroundNamePattern());
-            this.state.setBackgroundName(backgroundNames[0]);
         } catch (Exception ex) {
             log.error("OnCreate: ", ex);
         }
 
         state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
+        state.setSpriteName("1");
     }
 
     @Override
@@ -244,10 +247,7 @@ public class SceneFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String message = messageInput.getText().toString();
-                if(!sfxSelected) {
-                    state.setBackgroundName("");
-                }
-                log.debug("Sending state: {}", state);
+                state.setSfx(sfxSelected ? sfxName : "");
                 client.sendICMessage(state, message);
                 messageInput.setText("");
             }
@@ -300,7 +300,7 @@ public class SceneFragment extends Fragment {
         sfxSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                state.setSfx(sfxFiles[position].getName().split("\\.")[0]);
+                sfxName = sfxFiles[position].getName().split("\\.")[0];
             }
 
             @Override

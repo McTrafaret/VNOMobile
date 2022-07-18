@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.vnolib.client.model.Server;
 import com.example.vnomobile.R;
-import com.example.vnomobile.adapter.ListOfServersAdapter;
 import com.example.vnomobile.adapter.OnServerEntryListener;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,6 @@ public class ListOfServersViewHolder extends RecyclerView.ViewHolder implements 
 
     @Override
     public void onClick(View v) {
-        log.debug("Clicked");
         listener.onServerEntryClick(server);
     }
 }

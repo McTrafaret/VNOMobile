@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @ToString
@@ -39,6 +40,7 @@ public class MSCommand extends BaseCommand {
     @CommandArgument(index = 5, optional = false)
     int characterId;
 
+    @Setter
     @CommandArgument(index = 6, optional = false)
     String backgroundImageName;
 

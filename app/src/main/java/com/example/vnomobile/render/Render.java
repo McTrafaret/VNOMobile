@@ -13,6 +13,7 @@ import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.example.vnolib.command.servercommands.enums.SpriteFlip;
 import com.example.vnomobile.util.FileUtil;
 
 import lombok.Builder;
@@ -83,6 +84,11 @@ public class Render {
             }
             Rect spriteRect = new Rect(offset, 0, canvas.getWidth() + offset, canvas.getHeight());
             Bitmap spriteBitmap = FileUtil.loadBitmapFromFile(view, spriteInfo.getSpriteFile());
+            if(spriteInfo.getFlip().equals(SpriteFlip.FLIP)) {
+                Matrix matrix = new Matrix();
+                matrix.postScale(-1, 1, spriteBitmap.getWidth() / 2f, spriteBitmap.getHeight() / 2f);
+                spriteBitmap = Bitmap.createBitmap(spriteBitmap, 0, 0, spriteBitmap.getWidth(), spriteBitmap.getHeight(), matrix, true);
+            }
             canvas.drawBitmap(spriteBitmap, null, spriteRect, antiAliasPaint);
         }
         if(model.getText().trim().isEmpty()) {

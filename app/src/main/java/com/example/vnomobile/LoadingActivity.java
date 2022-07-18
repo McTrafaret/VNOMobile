@@ -122,7 +122,6 @@ public class LoadingActivity extends AppCompatActivity {
         this.loadedAreas = new AtomicInteger(0);
         this.loadedTracks = new AtomicInteger(0);
 
-        log.debug("Num of tracks: {}", client.getNumOfTracks());
         client.requestCharacters();
         changeText("Loading characters...");
     }
