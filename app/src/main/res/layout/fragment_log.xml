@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragment.LogFragment">
+    tools:context="xyz.udalny.vnomobile.fragment.LogFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/log_recycler_view"

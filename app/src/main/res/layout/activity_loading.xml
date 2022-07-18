@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".LoadingActivity">
+    tools:context="xyz.udalny.vnomobile.LoadingActivity">
 
     <ProgressBar
         android:id="@+id/progressBar"

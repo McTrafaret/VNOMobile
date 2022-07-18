@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".fragment.ListOfServersFragment">
+    tools:context="xyz.udalny.vnomobile.fragment.ListOfServersFragment">
 
     <!-- TODO: Update blank fragment layout -->
 

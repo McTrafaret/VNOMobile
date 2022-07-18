@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".ServersListActivity">
+    tools:context="xyz.udalny.vnomobile.ServersListActivity">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/list_of_servers_tabs"

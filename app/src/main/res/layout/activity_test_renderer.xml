@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TestRendererActivity">
+    tools:context="xyz.udalny.vnomobile.TestRendererActivity">
 
     <SurfaceView
         android:id="@+id/test_renderer_surface_view"

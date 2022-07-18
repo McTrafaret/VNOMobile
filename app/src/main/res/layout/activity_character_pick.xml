@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context=".CharacterPickActivity">
+    tools:context="xyz.udalny.vnomobile.CharacterPickActivity">
 
     <TextView
         android:id="@+id/character_name_text_view"
