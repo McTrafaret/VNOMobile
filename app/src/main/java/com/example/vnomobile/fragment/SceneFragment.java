@@ -87,6 +87,7 @@ public class SceneFragment extends Fragment {
     private Engine sceneHandlerEngine;
 
     private boolean sfxSelected = false;
+    private File[] sfxFiles;
 
     @OnCommand(ROOKCommand.class)
     public void onAreaChanged(ROOKCommand command) {
@@ -217,7 +218,7 @@ public class SceneFragment extends Fragment {
         initColorSlider(view);
         initBackgroundSpinner(view);
         initIniSpinner(view);
-        this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
+        initSfxSelectSpinner(view);
         initPositionButton(view);
         initFlipButton(view);
         initSfxButton(view);
@@ -243,6 +244,10 @@ public class SceneFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String message = messageInput.getText().toString();
+                if(!sfxSelected) {
+                    state.setBackgroundName("");
+                }
+                log.debug("Sending state: {}", state);
                 client.sendICMessage(state, message);
                 messageInput.setText("");
             }
@@ -277,6 +282,25 @@ public class SceneFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 state.setBackgroundName(backgroundNames[position]);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void initSfxSelectSpinner(View view) {
+        this.sfxSelectSpinner = view.findViewById(R.id.sfx_select_spinner);
+        this.sfxFiles = dataDirectory.getSfxFiles();
+        FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, sfxFiles);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sfxSelectSpinner.setAdapter(adapter);
+        sfxSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                state.setSfx(sfxFiles[position].getName().split("\\.")[0]);
             }
 
             @Override

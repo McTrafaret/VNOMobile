@@ -6,9 +6,11 @@ import com.example.vnolib.command.servercommands.enums.SpritePosition;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
+@ToString
 public class CharacterState {
 
     BoxName boxName;
