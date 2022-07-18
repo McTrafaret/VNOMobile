@@ -17,6 +17,8 @@ import com.example.vnolib.client.Client;
 import com.example.vnolib.client.OnCommand;
 import com.example.vnolib.client.model.Area;
 import com.example.vnolib.command.servercommands.ROOKCommand;
+import com.example.vnolib.command.servercommands.RaCCommand;
+import com.example.vnolib.command.servercommands.RoCCommand;
 import com.example.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
 import com.example.vnomobile.adapter.AreaAdapter;
@@ -42,10 +44,31 @@ public class AreaFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                int currentAreaInAdapter = areaAdapter.getCurrentArea();
-                areaAdapter.changeCurrentArea(selectedArea.getLocationId() - 1);
-                areaAdapter.notifyItemChanged(selectedArea.getLocationId() - 1);
-                areaAdapter.notifyItemChanged(currentAreaInAdapter);
+                areaAdapter.changeCurrentArea(client.getCurrentArea());
+            }
+        });
+    }
+
+    @OnCommand(RaCCommand.class)
+    public void areaInfoChanged(RaCCommand command) {
+        Area area = client.getAreaById(command.getIdOfTheLocation());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                areaAdapter.areaInfoChanged(area);
+            }
+        });
+    }
+
+    @OnCommand(RoCCommand.class)
+    public void twoAreasInfoChanged(RoCCommand command) {
+        Area area1 = client.getAreaById(command.getIdOfTheJoinLocation());
+        Area area2 = client.getAreaById(command.getIdOfTheLeaveLocation());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                areaAdapter.areaInfoChanged(area1);
+                areaAdapter.areaInfoChanged(area2);
             }
         });
     }
@@ -57,6 +80,8 @@ public class AreaFragment extends Fragment {
         this.areaAdapter = new AreaAdapter(ClientHandler.getClient().getAreas());
         this.client = ClientHandler.getClient();
         client.subscribeToCommand(ROOKCommand.class, this);
+        client.subscribeToCommand(RoCCommand.class, this);
+        client.subscribeToCommand(RaCCommand.class, this);
     }
 
     @Override
@@ -69,6 +94,19 @@ public class AreaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.searchView = view.findViewById(R.id.area_search);
+        this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                areaAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
         this.areaRecyclerView = view.findViewById(R.id.area_recycler_view);
         this.areaRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         this.areaRecyclerView.setAdapter(areaAdapter);
@@ -86,6 +124,8 @@ public class AreaFragment extends Fragment {
     @Override
     public void onDestroy() {
         client.unsubscribeFromCommand(ROOKCommand.class, this);
+        client.unsubscribeFromCommand(RoCCommand.class, this);
+        client.unsubscribeFromCommand(RaCCommand.class, this);
         super.onDestroy();
     }
 }

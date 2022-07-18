@@ -5,11 +5,13 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,19 +24,55 @@ import com.example.vnomobile.resource.DataDirectory;
 import com.example.vnomobile.resource.ResourceHandler;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> {
+public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> implements Filterable {
 
+    private Area[] allAreas;
     private Area[] areas;
 
-    private int currentAreaIndex;
+    private int currentAreaId;
     private int lastItemSelectedPosition = -1;
 
     private DataDirectory dataDirectory;
 
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+
+            if(constraint == null || constraint.toString().trim().isEmpty()) {
+                filterResults.values = new ArrayList<Area>(Arrays.asList(allAreas));
+                return filterResults;
+            }
+
+            List<Area> filteredAreas = new ArrayList<>();
+
+            for(Area area : allAreas) {
+                if(area.getLocationName().toLowerCase().contains(constraint.toString().toLowerCase().trim())) {
+                    filteredAreas.add(area);
+                }
+            }
+
+            filterResults.values = filteredAreas;
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            List<Area> filteredAreas = (List<Area>) results.values;
+            areas = filteredAreas.toArray(new Area[0]);
+            notifyDataSetChanged();
+        }
+    };
+
     public AreaAdapter(Area[] areas) {
+        this.allAreas = areas;
         this.areas = areas;
-        this.currentAreaIndex = ClientHandler.getClient().getCurrentArea().getLocationId() - 1;
+        this.currentAreaId = ClientHandler.getClient().getCurrentArea().getLocationId();
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
     }
 
@@ -50,7 +88,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
     public void onBindViewHolder(@NonNull AreaViewHolder holder, int position) {
         holder.bind(areas[position],
                 position == lastItemSelectedPosition,
-                position == currentAreaIndex);
+                areas[position].getLocationId() == currentAreaId);
     }
 
     public Area getSelectedArea() {
@@ -60,12 +98,33 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
         return areas[lastItemSelectedPosition];
     }
 
-    public void changeCurrentArea(int position) {
-        currentAreaIndex = position;
+    public void areaInfoChanged(Area newArea) {
+        allAreas[newArea.getLocationId() - 1] = newArea;
+        for(int i = 0; i < areas.length; i++) {
+            if(areas[i].getLocationId() == newArea.getLocationId()) {
+                areas[i] = newArea;
+                notifyItemChanged(i);
+                break;
+            }
+        }
+    }
+
+    public void changeCurrentArea(Area area) {
+        int prevAreaId = currentAreaId;
+        currentAreaId = area.getLocationId();
+        for(int i = 0; i < areas.length; i++) {
+            if(areas[i].getLocationId() == currentAreaId) {
+                notifyItemChanged(i);
+            }
+            if(areas[i].getLocationId() == prevAreaId) {
+                notifyItemChanged(i);
+            }
+        }
+
     }
 
     public int getCurrentArea() {
-        return currentAreaIndex;
+        return currentAreaId;
     }
 
     @Override
@@ -73,13 +132,19 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
         return areas.length;
     }
 
+    @Override
+    public Filter getFilter() {
+        return filter;
+    }
+
     public class AreaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private Area area;
 
         private Resources resources;
-        private LinearLayout layout;
+        private ConstraintLayout layout;
         private TextView areaName;
+        private TextView characterCount;
         private TextView youAreHereText;
 
         public AreaViewHolder(@NonNull View itemView) {
@@ -88,6 +153,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
             this.resources = itemView.getResources();
             this.layout = itemView.findViewById(R.id.area_item_layout);
             this.areaName = itemView.findViewById(R.id.area_name_text);
+            this.characterCount = itemView.findViewById(R.id.character_count_text);
             this.youAreHereText = itemView.findViewById(R.id.you_are_here_text);
             itemView.setOnClickListener(this);
         }
@@ -116,6 +182,7 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
                 youAreHereText.setVisibility(View.GONE);
             }
             areaName.setText(area.getLocationName());
+            characterCount.setText(String.format("%d", area.getLocationPopulation()));
         }
 
         @Override
