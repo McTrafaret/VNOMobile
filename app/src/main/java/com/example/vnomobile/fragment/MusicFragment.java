@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,6 +23,8 @@ import com.example.vnomobile.adapter.MusicAdapter;
 
 public class MusicFragment extends Fragment {
 
+    private SearchView musicSearchView;
+    private MusicAdapter musicAdapter;
     private RecyclerView musicRecyclerView;
     private CheckBox loopCheckbox;
     private Button playButton;
@@ -47,8 +50,21 @@ public class MusicFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.musicSearchView = view.findViewById(R.id.music_search_view);
+        musicSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                musicAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
         this.musicRecyclerView = view.findViewById(R.id.music_recycler_view);
-        MusicAdapter musicAdapter = new MusicAdapter(client.getTracks());
+        this.musicAdapter = new MusicAdapter(client.getTracks());
         this.musicRecyclerView.setAdapter(musicAdapter);
         this.musicRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         this.loopCheckbox = view.findViewById(R.id.loop_checkbox);

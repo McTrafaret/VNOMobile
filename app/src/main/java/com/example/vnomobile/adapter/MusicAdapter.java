@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -13,14 +15,51 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.vnolib.client.model.Track;
 import com.example.vnomobile.R;
 
-public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> implements Filterable {
+
+    private Track[] allTracks;
     private Track[] tracks;
 
     private int lastItemSelectedPosition = -1;
 
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults filterResults = new FilterResults();
+
+            if(constraint == null || constraint.toString().trim().isEmpty()) {
+                filterResults.values = new ArrayList<Track>(Arrays.asList(allTracks));
+                return filterResults;
+            }
+
+            List<Track> filteredResults = new ArrayList<>();
+
+            for (Track track : allTracks) {
+                if(track.getTrackName().toLowerCase().contains(constraint.toString().trim().toLowerCase())) {
+                    filteredResults.add(track);
+                }
+            }
+
+            filterResults.values = filteredResults;
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            List<Track> filteredTracks = (List<Track>) results.values;
+            tracks = filteredTracks.toArray(new Track[0]);
+            notifyDataSetChanged();
+        }
+    };
+
     public MusicAdapter(Track[] tracks) {
-        this.tracks = tracks;
+        this.allTracks = tracks;
+        this.tracks = this.allTracks;
     }
 
     @NonNull
@@ -46,6 +85,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             return null;
         }
         return tracks[lastItemSelectedPosition];
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
     }
 
     public class MusicViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
