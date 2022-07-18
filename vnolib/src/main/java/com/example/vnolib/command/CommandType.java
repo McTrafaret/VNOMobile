@@ -18,6 +18,7 @@ import com.example.vnolib.command.servercommands.GaBResponseCommand;
 import com.example.vnolib.command.servercommands.GmBResponseCommand;
 import com.example.vnolib.command.servercommands.LISTCommand;
 import com.example.vnolib.command.servercommands.MCCommand;
+import com.example.vnolib.command.servercommands.MDCommand;
 import com.example.vnolib.command.servercommands.MODCommand;
 import com.example.vnolib.command.servercommands.MODOKCommand;
 import com.example.vnolib.command.servercommands.MSCommand;
@@ -25,9 +26,9 @@ import com.example.vnolib.command.servercommands.PCCommand;
 import com.example.vnolib.command.servercommands.POPUPCommand;
 import com.example.vnolib.command.servercommands.RADCommand;
 import com.example.vnolib.command.servercommands.RCDCommand;
-import com.example.vnolib.command.servercommands.MDCommand;
 import com.example.vnolib.command.servercommands.RMDCommand;
 import com.example.vnolib.command.servercommands.ROOKCommand;
+import com.example.vnolib.command.servercommands.RaCCommand;
 import com.example.vnolib.command.servercommands.ReqCommand;
 import com.example.vnolib.command.servercommands.RoCCommand;
 import com.example.vnolib.command.servercommands.SERVURLCommand;
@@ -64,6 +65,7 @@ public enum CommandType {
     SERVURL(SERVURLCommand.class),
     ARC(ARCCommand.class),
     ROOK(ROOKCommand.class),
+    RaC(RaCCommand.class),
     RoC(RoCCommand.class),
     LIST(LISTCommand.class),
     POPUP(POPUPCommand.class),
