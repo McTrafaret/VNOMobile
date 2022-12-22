@@ -19,21 +19,6 @@ public class GifUtil {
         Bitmap[] bitmapArray = new Bitmap[numberOfFrames];
         for (int i = 0; i < numberOfFrames; i++) {
             Bitmap frameBitmap = decoder.frame(i);
-                /*
-                GifFrame frame = reader.read();
-
-                Bitmap frameBitmap = Bitmap.createBitmap(frame.getWidth(),
-                        frame.getHeight(),
-                        Bitmap.Config.ARGB_8888);
-
-                frameBitmap.setPixels(frame.getData(),
-                        0,
-                        frame.getWidth(),
-                        0, 0,
-                        frame.getWidth(),
-                        frame.getHeight());
-                        */
-
             bitmapArray[i] = frameBitmap;
         }
         return bitmapArray;

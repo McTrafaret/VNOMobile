@@ -7,14 +7,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.vnomobile.R;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
 import xyz.udalny.vnolib.client.OnCommand;
 import xyz.udalny.vnolib.command.servercommands.MCCommand;
 import xyz.udalny.vnomobile.adapter.pager.MainScreenPagerAdapter;
 import xyz.udalny.vnomobile.resource.SoundHandler;
-
-import com.example.vnomobile.R;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 public class MainScreenActivity extends AppCompatActivity {
 

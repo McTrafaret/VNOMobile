@@ -7,6 +7,9 @@ import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,25 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import xyz.udalny.vnolib.client.Client;
-import xyz.udalny.vnolib.client.OnCommand;
-import xyz.udalny.vnolib.client.model.CharacterState;
-import xyz.udalny.vnolib.command.servercommands.MSCommand;
-import xyz.udalny.vnolib.command.servercommands.ROOKCommand;
-import xyz.udalny.vnolib.command.servercommands.enums.MessageColor;
-import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
-import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
-import xyz.udalny.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
-import xyz.udalny.vnomobile.adapter.SpriteButtonsAdapter;
-import xyz.udalny.vnomobile.render.Engine;
-import xyz.udalny.vnomobile.resource.CharacterData;
-import xyz.udalny.vnomobile.resource.CharacterIni;
-import xyz.udalny.vnomobile.resource.DataDirectory;
-import xyz.udalny.vnomobile.resource.ResourceHandler;
-import xyz.udalny.vnomobile.resource.SoundHandler;
-import xyz.udalny.vnomobile.resource.UIDesign;
-import xyz.udalny.vnomobile.util.UIUtil;
 
 import org.ini4j.Wini;
 
@@ -54,9 +39,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.client.Client;
+import xyz.udalny.vnolib.client.OnCommand;
+import xyz.udalny.vnolib.client.model.BoxName;
+import xyz.udalny.vnolib.client.model.CharacterState;
+import xyz.udalny.vnolib.command.servercommands.FORCESTREAMResponseCommand;
+import xyz.udalny.vnolib.command.servercommands.MSCommand;
+import xyz.udalny.vnolib.command.servercommands.ROOKCommand;
+import xyz.udalny.vnolib.command.servercommands.SERVURLCommand;
+import xyz.udalny.vnolib.command.servercommands.enums.MessageColor;
+import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
+import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
+import xyz.udalny.vnomobile.ClientHandler;
+import xyz.udalny.vnomobile.adapter.SpriteButtonsAdapter;
+import xyz.udalny.vnomobile.render.Engine;
+import xyz.udalny.vnomobile.resource.CharacterData;
+import xyz.udalny.vnomobile.resource.CharacterIni;
+import xyz.udalny.vnomobile.resource.DataDirectory;
+import xyz.udalny.vnomobile.resource.ResourceHandler;
+import xyz.udalny.vnomobile.resource.SoundHandler;
+import xyz.udalny.vnomobile.resource.design.UIDesign;
+import xyz.udalny.vnomobile.util.UIUtil;
 
 @Slf4j
 public class SceneFragment extends Fragment {
+
+    private Menu menu;
 
     private SurfaceView sceneView;
     private EditText messageInput;
@@ -110,10 +118,21 @@ public class SceneFragment extends Fragment {
 
     @OnCommand(MSCommand.class)
     public void onICMessage(MSCommand command) {
-        if(command.getBackgroundImageName() == null || command.getBackgroundImageName().isEmpty()) {
+        if (command.getBackgroundImageName() == null || command.getBackgroundImageName().isEmpty()) {
             command.setBackgroundImageName(client.getCurrentArea().getBackgroundNamePattern());
         }
         sceneHandlerEngine.handle(command);
+    }
+
+    @OnCommand(FORCESTREAMResponseCommand.class)
+    public void onForceStream(FORCESTREAMResponseCommand command) {
+
+    }
+
+    @OnCommand(SERVURLCommand.class)
+    public void onServUrl(SERVURLCommand command) {
+        log.debug("Got servurl: {}", command);
+        sceneHandlerEngine.showUrl(command.getUrl());
     }
 
     private static class ColorSliderListener implements SeekBar.OnSeekBarChangeListener {
@@ -128,20 +147,21 @@ public class SceneFragment extends Fragment {
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             int colorId = UIUtil.getColorId(MessageColor.fromInt(progress));
             int color = seekBar.getResources().getColor(colorId);
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 seekBar.getThumb().setColorFilter(new BlendModeColorFilter(color, BlendMode.SRC_ATOP));
-            }
-            else {
+            } else {
                 seekBar.getThumb().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
             }
             state.setMessageColor(MessageColor.fromInt(progress));
         }
 
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {}
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
 
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {}
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
     }
 
     private static class FileArrayAdapter extends ArrayAdapter<File> {
@@ -155,7 +175,7 @@ public class SceneFragment extends Fragment {
         public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             File file = getItem(position);
 
-            if(convertView == null) {
+            if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_item, null);
             }
             TextView textView = convertView.findViewById(android.R.id.text1);
@@ -167,7 +187,7 @@ public class SceneFragment extends Fragment {
         public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
             File file = getItem(position);
 
-            if(convertView == null) {
+            if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(android.R.layout.simple_spinner_dropdown_item, null);
             }
             TextView textView = convertView.findViewById(android.R.id.text1);
@@ -183,6 +203,7 @@ public class SceneFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         this.client = ClientHandler.getClient();
         this.state = new CharacterState();
         this.dataDirectory = ResourceHandler.getInstance().getDirectory();
@@ -199,6 +220,51 @@ public class SceneFragment extends Fragment {
 
         state.setBackgroundName(client.getCurrentArea().getBackgroundNamePattern());
         state.setSpriteName("1");
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.scene_menu, menu);
+        this.menu = menu;
+        switch (state.getBoxName()) {
+            case USERNAME:
+                menu.findItem(R.id.use_username_checkbox).setChecked(true);
+                break;
+            case MYSTERYNAME:
+                menu.findItem(R.id.use_mysteryname_checkbox).setChecked(true);
+                break;
+        }
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.use_mysteryname_checkbox:
+                if(item.isChecked()) {
+                    item.setChecked(false);
+                    state.setBoxName(BoxName.CHARACTER_NAME);
+                }
+                else {
+                    menu.findItem(R.id.use_username_checkbox).setChecked(false);
+                    item.setChecked(true);
+                    state.setBoxName(BoxName.MYSTERYNAME);
+                }
+                break;
+            case R.id.use_username_checkbox:
+                if(item.isChecked()) {
+                    item.setChecked(false);
+                    state.setBoxName(BoxName.CHARACTER_NAME);
+                }
+                else {
+                    menu.findItem(R.id.use_mysteryname_checkbox).setChecked(false);
+                    item.setChecked(true);
+                    state.setBoxName(BoxName.USERNAME);
+                }
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -230,6 +296,8 @@ public class SceneFragment extends Fragment {
         sceneHandlerEngine.showBackground(state.getBackgroundName());
 
         this.client.subscribeToCommand(ROOKCommand.class, this);
+        this.client.subscribeToCommand(SERVURLCommand.class, this);
+        this.client.subscribeToCommand(FORCESTREAMResponseCommand.class, this);
     }
 
     @Override
@@ -237,26 +305,25 @@ public class SceneFragment extends Fragment {
         sceneHandlerEngine.stop();
         client.unsubscribeFromCommand(MSCommand.class, this);
         client.unsubscribeFromCommand(ROOKCommand.class, this);
+        this.client.unsubscribeFromCommand(SERVURLCommand.class, this);
+        this.client.unsubscribeFromCommand(FORCESTREAMResponseCommand.class, this);
         super.onDestroy();
     }
 
     private void initSendButton(View view) {
         this.sendButton = view.findViewById(R.id.send_character_message_button);
 
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String message = messageInput.getText().toString();
-                state.setSfx(sfxSelected ? sfxName : "");
-                client.sendICMessage(state, message);
-                messageInput.setText("");
-            }
+        sendButton.setOnClickListener(v -> {
+            String message = messageInput.getText().toString();
+            state.setSfx(sfxSelected ? sfxName : "");
+            client.sendICMessage(state, message);
+            messageInput.setText("");
         });
     }
 
     private void initListOfCharacterButtons(View view) {
         this.listOfCharacterButtons = view.findViewById(R.id.list_of_character_buttons);
-        buttonsAdapter = new SpriteButtonsAdapter(currentIniFile.getButtons(), design, state);
+        buttonsAdapter = new SpriteButtonsAdapter(currentIniFile == null ? null : currentIniFile.getButtons(), design, state);
         this.listOfCharacterButtons.setAdapter(buttonsAdapter);
         this.listOfCharacterButtons.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
     }
@@ -271,9 +338,9 @@ public class SceneFragment extends Fragment {
     private void initBackgroundSpinner(View view) {
         this.backgroundSelectSpinner = view.findViewById(R.id.background_select_spinner);
 
-        this.backgroundAdapter = new ArrayAdapter<String>(getContext(),
+        this.backgroundAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item,
-                new ArrayList<>(Arrays.asList(backgroundNames)));
+                backgroundNames == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(backgroundNames)));
 
         backgroundAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
@@ -312,7 +379,8 @@ public class SceneFragment extends Fragment {
 
     private void initIniSpinner(View view) {
         this.iniSelectSpinner = view.findViewById(R.id.ini_select_spinner);
-        FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item, characterData.getIniFiles());
+        FileArrayAdapter adapter = new FileArrayAdapter(getContext(), android.R.layout.simple_spinner_item,
+                characterData == null ? new File[0] : characterData.getIniFiles());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         iniSelectSpinner.setAdapter(adapter);
         iniSelectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -338,17 +406,15 @@ public class SceneFragment extends Fragment {
     private void initPositionButton(View view) {
         this.positionButton = view.findViewById(R.id.position_button);
         Glide.with(this)
+                //TODO: add placeholders for left right and center
                 .load(design.getPositionToFileMap().get(state.getPosition()))
                 .into(positionButton);
-        this.positionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SpritePosition newPosition = state.getPosition().nextPosition();
-                state.setPosition(newPosition);
-                Glide.with(SceneFragment.this)
-                        .load(design.getPositionToFileMap().get(newPosition))
-                        .into(positionButton);
-            }
+        this.positionButton.setOnClickListener(v -> {
+            SpritePosition newPosition = state.getPosition().nextPosition();
+            state.setPosition(newPosition);
+            Glide.with(SceneFragment.this)
+                    .load(design.getPositionToFileMap().get(newPosition))
+                    .into(positionButton);
         });
     }
 
@@ -356,33 +422,29 @@ public class SceneFragment extends Fragment {
 
         this.flipButton = view.findViewById(R.id.flip_button);
         Glide.with(this)
+                // TODO: add placeholder
                 .load(design.getFlipToFileMap().get(state.getFlip()))
                 .into(flipButton);
-        this.flipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SpriteFlip newFlip = state.getFlip().nextFlip();
-                state.setFlip(newFlip);
-                Glide.with(SceneFragment.this)
-                        .load(design.getFlipToFileMap().get(newFlip))
-                        .into(flipButton);
-            }
+        this.flipButton.setOnClickListener(v -> {
+            SpriteFlip newFlip = state.getFlip().nextFlip();
+            state.setFlip(newFlip);
+            Glide.with(SceneFragment.this)
+                    .load(design.getFlipToFileMap().get(newFlip))
+                    .into(flipButton);
         });
     }
 
     private void initSfxButton(View view) {
         this.sfxButton = view.findViewById(R.id.sfx_button);
         Glide.with(this)
+                // TODO: add placeholder
                 .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
                 .into(sfxButton);
-        this.sfxButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sfxSelected = !sfxSelected;
-                Glide.with(SceneFragment.this)
-                        .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
-                        .into(sfxButton);
-            }
+        this.sfxButton.setOnClickListener(v -> {
+            sfxSelected = !sfxSelected;
+            Glide.with(SceneFragment.this)
+                    .load(design.getSfxButtonsFiles()[sfxSelected ? 1 : 0])
+                    .into(sfxButton);
         });
 
     }

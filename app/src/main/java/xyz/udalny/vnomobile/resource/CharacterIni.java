@@ -1,12 +1,12 @@
 package xyz.udalny.vnomobile.resource;
 
-import xyz.udalny.vnomobile.util.FileUtil;
-
 import org.ini4j.Profile;
 import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
+
+import xyz.udalny.vnomobile.util.FileUtil;
 
 public class CharacterIni {
 
@@ -15,8 +15,11 @@ public class CharacterIni {
 
     private static File getSfxFile(File iniFile, String sfxFileName) {
         File dataDirectory = iniFile.getParentFile().getParentFile().getParentFile();
-        File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(dataDirectory, "sfx");
-        for(String filename : sfxDirectory.list()) {
+        File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(dataDirectory, "sounds/sfx");
+        String[] fileNames = sfxDirectory.list();
+        if(fileNames == null)
+            return null;
+        for(String filename : fileNames) {
             if(filename.toLowerCase().startsWith(sfxFileName.toLowerCase())) {
                 return new File(sfxDirectory, filename);
             }
@@ -52,8 +55,11 @@ public class CharacterIni {
             } catch (Exception ex) {
                 continue;
             }
+            if(index > numOfButtons) {
+                continue;
+            }
             File sfxFile = null;
-            if(sfxSection.containsKey(key)) {
+            if(sfxSection != null && sfxSection.containsKey(key)) {
                 String sfxFileName = sfxSection.get(key);
                 sfxFile = getSfxFile(iniFile, sfxFileName);
             }

@@ -1,5 +1,6 @@
 package xyz.udalny.vnolib.command.servercommands;
 
+import lombok.Getter;
 import xyz.udalny.vnolib.command.BaseCommand;
 import xyz.udalny.vnolib.command.Command;
 import xyz.udalny.vnolib.command.CommandArgument;
@@ -13,6 +14,7 @@ import lombok.ToString;
  */
 @ToString
 @Command(name = "SERVURL", numOfArguments = 1)
+@Getter
 public class SERVURLCommand extends BaseCommand {
 
     @CommandArgument(index = 0, optional = false)

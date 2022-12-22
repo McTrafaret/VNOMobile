@@ -2,26 +2,19 @@ package xyz.udalny.vnomobile.render;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
-import xyz.udalny.vnolib.client.model.BoxName;
-import xyz.udalny.vnolib.command.servercommands.MSCommand;
-import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
-import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
-import xyz.udalny.vnomobile.resource.CharacterData;
-import xyz.udalny.vnomobile.resource.DataDirectory;
-import xyz.udalny.vnomobile.resource.SoundHandler;
-import xyz.udalny.vnomobile.resource.Sprite;
-import xyz.udalny.vnomobile.resource.UIDesign;
-import xyz.udalny.vnomobile.util.GifUtil;
-import xyz.udalny.vnomobile.util.UIUtil;
+import com.bumptech.glide.Glide;
 
 import org.ini4j.Profile;
 import org.ini4j.Wini;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,6 +25,17 @@ import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.client.model.BoxName;
+import xyz.udalny.vnolib.command.servercommands.MSCommand;
+import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
+import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
+import xyz.udalny.vnomobile.resource.CharacterData;
+import xyz.udalny.vnomobile.resource.DataDirectory;
+import xyz.udalny.vnomobile.resource.SoundHandler;
+import xyz.udalny.vnomobile.resource.design.UIDesign;
+import xyz.udalny.vnomobile.resource.sprite.Sprite;
+import xyz.udalny.vnomobile.util.GifUtil;
+import xyz.udalny.vnomobile.util.UIUtil;
 
 @Slf4j
 public class Engine {
@@ -83,15 +87,15 @@ public class Engine {
         public void run() {
             while (!stopped) {
                 Canvas canvas = null;
-                if (surfaceHolder == null || currentModelWithoutMessage == null || (canvas = surfaceHolder.lockCanvas()) == null ) {
+                if (surfaceHolder == null || currentModelWithoutMessage == null || (canvas = surfaceHolder.lockCanvas()) == null) {
                     synchronized (Engine.this) {
-                        if(stopped) {
+                        if (stopped) {
                             break;
                         }
                         try {
                             Engine.this.wait();
                         } catch (InterruptedException e) {
-                            if(stopped) {
+                            if (stopped) {
                                 break;
                             }
                             e.printStackTrace();
@@ -106,21 +110,20 @@ public class Engine {
                         }
                         if (!currentModelWithoutMessage.getState().equals(RenderState.ONLY_BACKGROUND) &&
                                 lastShownLetterIndex <= currentMessage.length() - 1) {
-                            if(!Character.isSpaceChar(currentMessage.charAt(lastShownLetterIndex))) {
+                            if (!Character.isSpaceChar(currentMessage.charAt(lastShownLetterIndex))) {
                                 soundHandler.playBleep(bleepName);
                             }
                             currentModelWithoutMessage.setText(currentMessage.substring(0,
                                     lastShownLetterIndex + 1));
                             lastShownLetterIndex += 1;
-                        }
-                        else {
-                            if(currentModelWithoutMessage.getState().equals(RenderState.NO_ARROW)) {
+                        } else {
+                            if (currentModelWithoutMessage.getState().equals(RenderState.NO_ARROW)) {
                                 currentModelWithoutMessage.setState(RenderState.FULL);
                             }
                         }
                         render.draw(canvas, currentModelWithoutMessage);
                     }
-                    if(sfxName != null && !sfxPlayed) {
+                    if (sfxName != null && !sfxPlayed) {
                         soundHandler.playSfx(sfxName);
                         sfxPlayed = true;
                         sfxName = null;
@@ -129,7 +132,7 @@ public class Engine {
                     try {
                         Thread.sleep(TEXT_SPEED);
                     } catch (InterruptedException e) {
-                        if(stopped) {
+                        if (stopped) {
                             break;
                         }
                         e.printStackTrace();
@@ -202,13 +205,10 @@ public class Engine {
         this.runThread.start();
     }
 
-    public void handle(MSCommand command) {
+    private String getNameToShow(CharacterData characterData, String boxNameString) {
         String nameToShow = null;
-        String bleepName = null;
-        BoxName boxName = BoxName.fromString(command.getBoxName());
+        BoxName boxName = BoxName.fromString(boxNameString);
         try {
-            CharacterData characterData =
-                    dataDirectory.getCharacterData(command.getCharacterName());
             switch (boxName) {
                 case CHARACTER_NAME:
                     nameToShow = characterData.getShowName();
@@ -217,55 +217,101 @@ public class Engine {
                     nameToShow = characterData.getMysteryName();
                     break;
                 case USERNAME:
-                    nameToShow = command.getBoxName();
+                    nameToShow = boxNameString;
                     break;
             }
-            bleepName = characterData.getBlipsFileName();
         } catch (Exception ex) {
-            if (boxName.equals(BoxName.USERNAME)) {
-                nameToShow = command.getBoxName();
-            } else {
-                nameToShow = "???";
+            nameToShow = "???";
+        }
+        return nameToShow;
+    }
+
+    private String getBleepName(CharacterData characterData) {
+        return characterData.getBlipsFileName();
+    }
+
+    private Positions handlePositions(Sprite newSprite,
+                                      SpritePosition spritePosition,
+                                      SpriteFlip spriteFlip,
+                                      String backgroundImageName) {
+        if (!backgroundToPositionsMap.containsKey(backgroundImageName)) {
+            backgroundToPositionsMap.put(backgroundImageName, new Positions());
+        }
+
+        Positions positions = backgroundToPositionsMap.get(backgroundImageName);
+        if (spritePosition.equals(SpritePosition.LEFT)) {
+            if (positions.getRightSprite() != null && positions.getRightSprite().getName().equals(newSprite.getName())) {
+                positions.setRightSprite(null);
             }
+            positions.setLeftSprite(newSprite);
+            positions.setLeftSpriteFlip(spriteFlip);
+        } else if (spritePosition.equals(SpritePosition.RIGHT)) {
+            if (positions.getLeftSprite() != null && positions.getLeftSprite().getName().equals(newSprite.getName())) {
+                positions.setLeftSprite(null);
+            }
+            positions.setRightSprite(newSprite);
+            positions.setRightSpriteFlip(spriteFlip);
+        }
+
+        return positions;
+    }
+
+    public List<RenderModel.SpriteDrawInfo> createListOfThingsToRender(Sprite newSprite,
+                                                                       SpritePosition newSpritePosition,
+                                                                       SpriteFlip newSpriteFlip,
+                                                                       Positions otherSpritePositions) {
+        List<RenderModel.SpriteDrawInfo> infoList = new LinkedList<>();
+        if (newSpritePosition.equals(SpritePosition.CENTER)) {
+
+            infoList.add(new RenderModel.SpriteDrawInfo(newSprite,
+                    SpritePosition.CENTER, newSpriteFlip));
+        } else {
+            Sprite left = otherSpritePositions.getLeftSprite();
+            Sprite right = otherSpritePositions.getRightSprite();
+            if (left != null) {
+                infoList.add(new RenderModel.SpriteDrawInfo(left,
+                        SpritePosition.LEFT, otherSpritePositions.getLeftSpriteFlip()));
+            }
+            if (right != null) {
+                infoList.add(new RenderModel.SpriteDrawInfo(right,
+                        SpritePosition.RIGHT, otherSpritePositions.getRightSpriteFlip()));
+            }
+        }
+
+        return infoList;
+    }
+
+    public void handle(MSCommand command) {
+        String nameToShow = null;
+        String bleepName = null;
+        try {
+            CharacterData characterData =
+                    dataDirectory.getCharacterData(command.getCharacterName());
+            nameToShow = getNameToShow(characterData, command.getBoxName());
+            bleepName = getBleepName(characterData);
+        } catch (Exception ex) {
+            nameToShow = "???";
         }
         Sprite sprite = dataDirectory.getSprite(command.getCharacterName(),
                 command.getSpriteName());
 
-        if (!backgroundToPositionsMap.containsKey(command.getBackgroundImageName())) {
-            backgroundToPositionsMap.put(command.getBackgroundImageName(), new Positions());
-        }
+        Positions positions = handlePositions(
+                sprite,
+                command.getPosition(),
+                command.getFlip(),
+                command.getBackgroundImageName());
 
-        Positions positions = backgroundToPositionsMap.get(command.getBackgroundImageName());
-        if (command.getPosition().equals(SpritePosition.LEFT)) {
-            if(positions.getRightSprite() != null && positions.getRightSprite().getName().equals(sprite.getName())) {
-                positions.setRightSprite(null);
-            }
-            positions.setLeftSprite(sprite);
-            positions.setLeftSpriteFlip(command.getFlip());
-        } else if (command.getPosition().equals(SpritePosition.RIGHT)) {
-            if(positions.getLeftSprite() != null && positions.getLeftSprite().getName().equals(sprite.getName())) {
-                positions.setLeftSprite(null);
-            }
-            positions.setRightSprite(sprite);
-            positions.setRightSpriteFlip(command.getFlip());
-        }
+        List<RenderModel.SpriteDrawInfo> spritesToDraw = createListOfThingsToRender(
+                sprite,
+                command.getPosition(),
+                command.getFlip(),
+                positions
+        );
 
-        List<RenderModel.SpriteDrawInfo> infoList = new LinkedList<>();
-        if (command.getPosition().equals(SpritePosition.CENTER)) {
 
-            infoList.add(new RenderModel.SpriteDrawInfo(sprite.getSpriteFile(),
-                    SpritePosition.CENTER, command.getFlip()));
-        } else {
-            Sprite left = positions.getLeftSprite();
-            Sprite right = positions.getRightSprite();
-            if (left != null) {
-                infoList.add(new RenderModel.SpriteDrawInfo(left.getSpriteFile(),
-                        SpritePosition.LEFT, positions.getLeftSpriteFlip()));
-            }
-            if (right != null) {
-                infoList.add(new RenderModel.SpriteDrawInfo(right.getSpriteFile(),
-                        SpritePosition.RIGHT, positions.getRightSpriteFlip()));
-            }
+        File background = dataDirectory.getBackgroundFile(command.getBackgroundImageName());
+        if (background == null) {
+            background = design.getBackdropFile();
         }
 
 
@@ -280,8 +326,8 @@ public class Engine {
                     .text(command.getMessage())
                     .textColor(surfaceView.getResources().getColor(UIUtil.getColorId(command.getMessageColor())))
                     .textBoxFile(design.getChatBoxFile())
-                    .backgroundFile(dataDirectory.getBackgroundFile(command.getBackgroundImageName()))
-                    .spriteDrawInfo(infoList)
+                    .backgroundFile(background)
+                    .spriteDrawInfo(spritesToDraw)
                     .build();
 
             modelChanged = true;
@@ -304,6 +350,33 @@ public class Engine {
         synchronized (this) {
             notifyAll();
         }
+    }
+
+    public void showUrl(String url) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Bitmap bitmap;
+                try {
+                    bitmap = Glide.with(surfaceView)
+                            .asBitmap()
+                            .load(url)
+                            .submit()
+                            .get();
+                } catch (Exception ex) {
+                    log.error("Failed to load an image from {}: ", url, ex);
+                    return;
+                }
+
+                Canvas canvas = surfaceHolder.lockCanvas();
+                Paint antiAliasPaint = new Paint();
+                antiAliasPaint.setAntiAlias(true);
+                antiAliasPaint.setFilterBitmap(true);
+                Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
+                canvas.drawBitmap(bitmap, null, canvasRect, antiAliasPaint);
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+        }).start();
     }
 
     public void clearPositions() {

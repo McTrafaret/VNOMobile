@@ -12,17 +12,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import xyz.udalny.vnolib.client.model.CharacterState;
 import com.example.vnomobile.R;
-import xyz.udalny.vnomobile.resource.CharacterButton;
-import xyz.udalny.vnomobile.resource.UIDesign;
-import xyz.udalny.vnomobile.util.FileUtil;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
 
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.client.model.CharacterState;
+import xyz.udalny.vnomobile.resource.CharacterButton;
+import xyz.udalny.vnomobile.resource.design.UIDesign;
+import xyz.udalny.vnomobile.util.FileUtil;
 
 @Slf4j
 public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdapter.ListOfSpriteViewHolder> {
@@ -55,7 +55,7 @@ public class SpriteButtonsAdapter extends RecyclerView.Adapter<SpriteButtonsAdap
 
     @Override
     public int getItemCount() {
-        return buttons.length;
+        return buttons == null ? 0 : buttons.length;
     }
 
     public class ListOfSpriteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

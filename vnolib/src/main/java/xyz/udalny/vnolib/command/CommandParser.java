@@ -1,16 +1,16 @@
 package xyz.udalny.vnolib.command;
 
 
-import xyz.udalny.vnolib.command.servercommands.CADCommand;
-import xyz.udalny.vnolib.command.servercommands.enums.CommandEnum;
-import xyz.udalny.vnolib.exception.CommandException;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.command.servercommands.ADCommand;
+import xyz.udalny.vnolib.command.servercommands.CADCommand;
+import xyz.udalny.vnolib.command.servercommands.enums.CommandEnum;
+import xyz.udalny.vnolib.exception.CommandException;
 
 @Slf4j
 public class CommandParser {
@@ -69,12 +69,44 @@ public class CommandParser {
         return cadCommand;
     }
 
+    // developers thought it would be very convenient if
+    // sometimes the password to the location just wouldn't be passed
+    // as an argument.
+    // so now we have the whole method which handles this situation :))))))))))))))))))))))
+    private static ADCommand parseAD(String commandString) {
+
+        String[] nameAndArgs = commandString.split("#");
+        String name = nameAndArgs[0];
+        String[] args = Arrays.copyOfRange(nameAndArgs, 1, nameAndArgs.length - 1);
+
+
+        if(args.length < 4) {
+            return null;
+        }
+
+        ADCommand adCommand = new ADCommand();
+
+        adCommand.setLocationId(Integer.parseInt(args[0]));
+        adCommand.setLocationName(args[1]);
+        adCommand.setLocationPopulation(Integer.parseInt(args[2]));
+        adCommand.setBackgroundNamePattern(args[3]);
+        if(args.length == 5) {
+            adCommand.setArg5(args[4]);
+        }
+        return adCommand;
+    }
+
     public static BaseCommand parse(String commandString) throws CommandException {
+        log.debug("Command string: {}", commandString);
 
         commandString = commandString.trim();
 
         if(commandString.startsWith(CommandType.CAD + "#")) {
             return parseCAD(commandString);
+        }
+
+        if(commandString.startsWith(CommandType.AD + "#")) {
+            return parseAD(commandString);
         }
 
         if(!COMMAND_PATTERN.matcher(commandString).matches()) {

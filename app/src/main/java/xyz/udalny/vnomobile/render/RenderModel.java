@@ -1,14 +1,14 @@
 package xyz.udalny.vnomobile.render;
 
-import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
-import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
-
 import java.io.File;
 import java.util.List;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
+import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
+import xyz.udalny.vnomobile.resource.sprite.Sprite;
 
 @Builder
 @Getter
@@ -16,12 +16,12 @@ public class RenderModel {
 
     @Getter
     public static class SpriteDrawInfo {
-        private File spriteFile;
+        private Sprite sprite;
         private SpritePosition position;
         private SpriteFlip flip;
 
-        public SpriteDrawInfo(File spriteFile, SpritePosition position, SpriteFlip flip) {
-            this.spriteFile = spriteFile;
+        public SpriteDrawInfo(Sprite sprite, SpritePosition position, SpriteFlip flip) {
+            this.sprite = sprite;
             this.position = position;
             this.flip = flip;
         }

@@ -17,16 +17,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import xyz.udalny.vnolib.client.model.Area;
-import xyz.udalny.vnomobile.ClientHandler;
 import com.example.vnomobile.R;
-import xyz.udalny.vnomobile.resource.DataDirectory;
-import xyz.udalny.vnomobile.resource.ResourceHandler;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import xyz.udalny.vnolib.client.model.Area;
+import xyz.udalny.vnomobile.ClientHandler;
+import xyz.udalny.vnomobile.resource.DataDirectory;
+import xyz.udalny.vnomobile.resource.ResourceHandler;
 
 public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder> implements Filterable {
 
@@ -38,13 +39,13 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
     private DataDirectory dataDirectory;
 
-    private Filter filter = new Filter() {
+    private final Filter filter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
 
             if(constraint == null || constraint.toString().trim().isEmpty()) {
-                filterResults.values = new ArrayList<Area>(Arrays.asList(allAreas));
+                filterResults.values = new ArrayList<>(Arrays.asList(allAreas));
                 return filterResults;
             }
 
@@ -141,11 +142,11 @@ public class AreaAdapter extends RecyclerView.Adapter<AreaAdapter.AreaViewHolder
 
         private Area area;
 
-        private Resources resources;
-        private ConstraintLayout layout;
-        private TextView areaName;
-        private TextView characterCount;
-        private TextView youAreHereText;
+        private final Resources resources;
+        private final ConstraintLayout layout;
+        private final TextView areaName;
+        private final TextView characterCount;
+        private final TextView youAreHereText;
 
         public AreaViewHolder(@NonNull View itemView) {
             super(itemView);

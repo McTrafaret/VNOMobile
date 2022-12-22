@@ -6,23 +6,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import xyz.udalny.vnolib.client.model.Server;
 import com.example.vnomobile.R;
-import xyz.udalny.vnomobile.adapter.OnServerEntryListener;
 
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.client.model.Server;
+import xyz.udalny.vnomobile.adapter.OnServerEntryListener;
 
 @Slf4j
 public class ListOfServersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    private TextView serverName;
-    private TextView serverDescription;
+    private final TextView serverName;
+    private final TextView serverDescription;
 
-    private TextView serverIp;
-    private TextView serverPort;
+    private final TextView serverIp;
+    private final TextView serverPort;
 
     private Server server;
-    private OnServerEntryListener listener;
+    private final OnServerEntryListener listener;
 
     public ListOfServersViewHolder(@NonNull View itemView, OnServerEntryListener listener) {
         super(itemView);

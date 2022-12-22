@@ -1,5 +1,7 @@
 package xyz.udalny.vnomobile.render;
 
+import static com.bumptech.glide.Glide.with;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,11 +15,12 @@ import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
-import xyz.udalny.vnomobile.util.FileUtil;
+import com.example.vnomobile.R;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
+import xyz.udalny.vnomobile.util.FileUtil;
 
 @Slf4j
 @Builder
@@ -67,12 +70,22 @@ public class Render {
         antiAliasPaint.setAntiAlias(true);
         antiAliasPaint.setFilterBitmap(true);
         Rect canvasRect = new Rect(0, 0, canvas.getWidth(), canvas.getHeight());
-        Bitmap backgroundBitmap = FileUtil.loadBitmapFromFile(view, model.getBackgroundFile());
+        Bitmap backgroundBitmap = null;
+        try {
+            backgroundBitmap = with(view)
+                    .asBitmap()
+                    .load(model.getBackgroundFile())
+                    .error(R.drawable.saul_icon)
+                    .submit()
+                    .get();
+        } catch (Exception ex) {
+            log.error("Failed to load background: ", ex);
+        }
         canvas.drawBitmap(backgroundBitmap, null, canvasRect, antiAliasPaint);
-        if(model.getState().equals(RenderState.ONLY_BACKGROUND)) {
+        if (model.getState().equals(RenderState.ONLY_BACKGROUND)) {
             return;
         }
-        for(RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
+        for (RenderModel.SpriteDrawInfo spriteInfo : model.getSpriteDrawInfo()) {
             int offset = canvas.getWidth() / 4;
             switch (spriteInfo.getPosition()) {
                 case LEFT:
@@ -83,15 +96,15 @@ public class Render {
                     offset = 0;
             }
             Rect spriteRect = new Rect(offset, 0, canvas.getWidth() + offset, canvas.getHeight());
-            Bitmap spriteBitmap = FileUtil.loadBitmapFromFile(view, spriteInfo.getSpriteFile());
-            if(spriteInfo.getFlip().equals(SpriteFlip.FLIP)) {
+            Bitmap spriteBitmap = spriteInfo.getSprite().getBitmap(view);
+            if (spriteInfo.getFlip().equals(SpriteFlip.FLIP)) {
                 Matrix matrix = new Matrix();
                 matrix.postScale(-1, 1, spriteBitmap.getWidth() / 2f, spriteBitmap.getHeight() / 2f);
                 spriteBitmap = Bitmap.createBitmap(spriteBitmap, 0, 0, spriteBitmap.getWidth(), spriteBitmap.getHeight(), matrix, true);
             }
             canvas.drawBitmap(spriteBitmap, null, spriteRect, antiAliasPaint);
         }
-        if(model.getText().trim().isEmpty()) {
+        if (model.getText().trim().isEmpty()) {
             return;
         }
         Bitmap textBoxBitmap = FileUtil.loadBitmapFromFile(view, model.getTextBoxFile());
@@ -121,18 +134,17 @@ public class Render {
         StaticLayout staticLayout;
         xOffset = (textXOffset + DEFAULT_TEXT_X_OFFSET) * xScaleRatio;
         yOffset = (textYOffset + DEFAULT_TEXT_Y_OFFSET) * yScaleRatio;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length(), textPaint, canvas.getWidth() - (int)xOffset)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            staticLayout = StaticLayout.Builder.obtain(model.getText(), 0, model.getText().length(), textPaint, canvas.getWidth() - (int) xOffset)
                     .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                     .setLineSpacing(SPACING_ADDITION, SPACING_MULTIPLIER)
                     .setIncludePad(INCLUDE_SPACING)
                     .setMaxLines(5)
                     .build();
-        }
-        else {
+        } else {
             staticLayout = new StaticLayout(model.getText(),
                     textPaint,
-                    canvas.getWidth() - (int)xOffset,
+                    canvas.getWidth() - (int) xOffset,
                     Layout.Alignment.ALIGN_NORMAL,
                     SPACING_MULTIPLIER,
                     SPACING_ADDITION,
@@ -142,7 +154,7 @@ public class Render {
         canvas.translate(xOffset, yOffset);
         staticLayout.draw(canvas);
         canvas.restore();
-        if(model.getState().equals(RenderState.NO_ARROW) || arrowGifSequence == null) {
+        if (model.getState().equals(RenderState.NO_ARROW) || arrowGifSequence == null) {
             return;
         }
 
@@ -155,4 +167,5 @@ public class Render {
         canvas.drawBitmap(arrowGifSequence[arrowFrame], matrix, antiAliasPaint);
         nextArrowFrame();
     }
+
 }

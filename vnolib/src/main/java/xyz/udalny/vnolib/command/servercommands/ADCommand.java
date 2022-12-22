@@ -1,5 +1,6 @@
 package xyz.udalny.vnolib.command.servercommands;
 
+import lombok.Setter;
 import xyz.udalny.vnolib.client.Client;
 import xyz.udalny.vnolib.client.model.Area;
 import xyz.udalny.vnolib.command.BaseCommand;
@@ -12,6 +13,7 @@ import lombok.ToString;
  * This command is sent by the server in response to {@link RADCommand}. It gives information about location(area).
  */
 @ToString
+@Setter
 @Command(name="AD", numOfArguments = 4)
 public class ADCommand extends BaseCommand {
 

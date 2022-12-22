@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ignore_music_checkbox"
+        android:checkable="true"
+        android:title="@string/ignore_music" />
+    <item
+        android:id="@+id/ignore_blips_checkbox"
+        android:checkable="true"
+        android:title="@string/ignore_blips" />
+    <item
+        android:id="@+id/ignore_sfx_checkbox"
+        android:checkable="true"
+        android:title="@string/ignore_sfx" />
+    <item
+        android:id="@+id/use_username_checkbox"
+        android:checkable="true"
+        android:title="@string/use_username_checkbox" />
+    <item
+        android:id="@+id/use_mysteryname_checkbox"
+        android:checkable="true"
+        android:title="@string/use_mysteryname_checkbox" />
+</menu>

@@ -34,4 +34,9 @@
     <string name="not_connected_yet">Not connected yet</string>
     <string name="server_connect_failed">Failed to connect to server</string>
     <string name="not_connected_to_master">Not connected to master</string>
+    <string name="ignore_music">Ignore music</string>
+    <string name="ignore_blips" >Ignore blips</string>
+    <string name="ignore_sfx">Ignore Sfx</string>
+    <string name="use_username_checkbox">Use Username</string>
+    <string name="use_mysteryname_checkbox">Use Mysteryname</string>
 </resources>

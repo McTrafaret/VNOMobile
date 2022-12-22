@@ -1,13 +1,12 @@
 package xyz.udalny.vnolib.connection;
 
-import xyz.udalny.vnolib.command.BaseCommand;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.command.BaseCommand;
 
 @Slf4j
 @Getter
@@ -78,6 +77,7 @@ public abstract class ServerConnection {
     }
 
     protected void sendCommand(BaseCommand command) {
+        log.debug("Sending command: {}", command);
         while (true) {
             try {
                 this.commandsToSend.put(command);

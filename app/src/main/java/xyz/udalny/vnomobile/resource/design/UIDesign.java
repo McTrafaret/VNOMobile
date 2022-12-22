@@ -1,29 +1,74 @@
-package xyz.udalny.vnomobile.resource;
+package xyz.udalny.vnomobile.resource.design;
 
-import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
-import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
-import xyz.udalny.vnomobile.util.FileUtil;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.view.View;
+import android.widget.ImageView;
+
+import com.bumptech.glide.Glide;
+import com.example.vnomobile.R;
 
 import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.concurrent.ExecutionException;
 
 import lombok.Getter;
+import xyz.udalny.vnolib.command.servercommands.enums.SpriteFlip;
+import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
+import xyz.udalny.vnomobile.util.FileUtil;
 
 @Getter
 public class UIDesign {
 
-    private final File designDirectory;
-    private final EnumMap<SpritePosition, File> positionToFileMap;
-    private final EnumMap<SpriteFlip, File> flipToFileMap;
-    private final File[] sfxButtonsFiles;
-    private final File[] emoteSelectFiles;
-    private final File arrowFile;
-    private final File backdropFile;
-    private final File chatBoxFile;
-    private final Wini settings;
+    protected File designDirectory;
+    protected EnumMap<SpritePosition, File> positionToFileMap;
+    protected EnumMap<SpriteFlip, File> flipToFileMap;
+    protected File[] sfxButtonsFiles;
+    protected File[] emoteSelectFiles;
+    protected File arrowFile;
+    protected File backdropFile;
+    protected File chatBoxFile;
+    protected Wini settings;
+
+    public void loadPositionButtonIntoView(SpritePosition position, Context context, ImageView view) {
+        Glide.with(context)
+                .load(positionToFileMap.get(position))
+                .into(view);
+    }
+
+    public void loadFlipButtonIntoView(SpriteFlip flip, Context context, ImageView view) {
+        Glide.with(context)
+                .load(flipToFileMap.get(flip))
+                .into(view);
+    }
+
+    public void loadSfxButtonIntoView(Boolean pressed, Context context, ImageView view) {
+        File file = sfxButtonsFiles[pressed ? 1 : 0];
+        Glide.with(context)
+                .load(file)
+                .into(view);
+    }
+
+    public Bitmap getBackdropBitmap(View view) throws ExecutionException, InterruptedException {
+        return Glide.with(view)
+                .asBitmap()
+                .load(backdropFile)
+                .error(R.drawable.saul_icon)
+                .submit()
+                .get();
+    }
+
+    public Bitmap getChatBoxBitmap(View view) throws ExecutionException, InterruptedException {
+        return Glide.with(view)
+                .asBitmap()
+                .load(chatBoxFile)
+                .error(R.drawable.saul_icon)
+                .submit()
+                .get();
+    }
 
     public UIDesign(File designDirectory) {
         Wini settings1;

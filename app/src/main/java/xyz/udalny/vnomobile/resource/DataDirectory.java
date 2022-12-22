@@ -1,10 +1,5 @@
 package xyz.udalny.vnomobile.resource;
 
-import xyz.udalny.vnolib.client.model.Character;
-import xyz.udalny.vnolib.client.model.Server;
-import xyz.udalny.vnomobile.exception.ResourceNotFoundException;
-import xyz.udalny.vnomobile.util.FileUtil;
-
 import org.ini4j.Wini;
 
 import java.io.BufferedReader;
@@ -19,6 +14,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
+import xyz.udalny.vnolib.client.model.Character;
+import xyz.udalny.vnolib.client.model.Server;
+import xyz.udalny.vnomobile.exception.ResourceNotFoundException;
+import xyz.udalny.vnomobile.resource.design.UIDesign;
+import xyz.udalny.vnomobile.resource.sprite.Sprite;
+import xyz.udalny.vnomobile.resource.sprite.SpritePlaceholder;
+import xyz.udalny.vnomobile.util.FileUtil;
 
 @Slf4j
 public class DataDirectory {
@@ -67,6 +69,10 @@ public class DataDirectory {
             File offIconFile = rosterImagesFiles[i];
             String characterName = offIconFile.getName().split("_")[0];
             File onIconFile = null;
+            if (i + 1 >= rosterImagesFiles.length) {
+                rosterImages.add(new RosterImage(characterName, null, offIconFile));
+                break;
+            }
             if (rosterImagesFiles[i + 1].getName().startsWith(characterName)) {
                 onIconFile = rosterImagesFiles[i + 1];
                 i++;
@@ -136,14 +142,14 @@ public class DataDirectory {
         File characterDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile,
                 pathToCharacterDir);
         if (characterDirectory == null) {
-            return null;
+            return new SpritePlaceholder();
         }
         for (String filename : characterDirectory.list()) {
             if (filename.toLowerCase().startsWith(spriteName.toLowerCase())) {
                 return new Sprite(new File(characterDirectory, filename));
             }
         }
-        return null;
+        return new SpritePlaceholder();
     }
 
     public UIDesign getDesign(String designName) {
@@ -180,7 +186,7 @@ public class DataDirectory {
     public File getBackgroundFile(String backgroundName) {
         String pathToBackground = String.format("data/background/%s", backgroundName);
         File backgroundFile = FileUtil.getCaseInsensitiveSubFile(directoryFile, pathToBackground);
-        if(backgroundFile != null) {
+        if (backgroundFile != null) {
             return backgroundFile;
         }
         return FileUtil.getCaseInsensitiveSubFileDropExtension(directoryFile, pathToBackground);
@@ -202,7 +208,7 @@ public class DataDirectory {
     public File getSfxFile(String sfxName) {
         File sfxDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds" +
                 "/sfx");
-        if(sfxDirectory == null) {
+        if (sfxDirectory == null) {
             return null;
         }
 
@@ -219,7 +225,7 @@ public class DataDirectory {
 
     public File getMusicTrack(String trackName) {
         File musicDirectory = FileUtil.getCaseInsensitiveSubFile(directoryFile, "data/sounds/music");
-        if(musicDirectory == null) {
+        if (musicDirectory == null) {
             log.warn("Music directory not found");
             return null;
         }
