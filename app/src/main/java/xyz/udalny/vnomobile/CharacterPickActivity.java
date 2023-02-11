@@ -20,7 +20,7 @@ import xyz.udalny.vnolib.client.model.Character;
 import xyz.udalny.vnolib.command.ascommands.NoCommand;
 import xyz.udalny.vnolib.command.servercommands.AllowedCommand;
 import xyz.udalny.vnolib.command.servercommands.TKNCommand;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import xyz.udalny.vnomobile.adapter.RosterImageAdapter;
 import xyz.udalny.vnomobile.exception.ResourceNotFoundException;

@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide;
 import xyz.udalny.vnolib.client.Client;
 import xyz.udalny.vnolib.client.model.Character;
 import xyz.udalny.vnomobile.ClientHandler;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.exception.ResourceNotFoundException;
 import xyz.udalny.vnomobile.resource.DataDirectory;
 import xyz.udalny.vnomobile.resource.RosterImage;

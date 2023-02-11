@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import xyz.udalny.vnolib.client.model.Track;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;

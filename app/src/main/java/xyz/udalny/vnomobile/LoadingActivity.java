@@ -12,7 +12,7 @@ import xyz.udalny.vnolib.client.OnCommand;
 import xyz.udalny.vnolib.command.servercommands.ADCommand;
 import xyz.udalny.vnolib.command.servercommands.CADCommand;
 import xyz.udalny.vnolib.command.servercommands.MDCommand;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

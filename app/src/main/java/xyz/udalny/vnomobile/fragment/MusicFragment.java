@@ -18,7 +18,7 @@ import xyz.udalny.vnolib.client.Client;
 import xyz.udalny.vnolib.client.model.Track;
 import xyz.udalny.vnolib.command.servercommands.enums.LoopingStatus;
 import xyz.udalny.vnomobile.ClientHandler;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.MusicAdapter;
 
 public class MusicFragment extends Fragment {

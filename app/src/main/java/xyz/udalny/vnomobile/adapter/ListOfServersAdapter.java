@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import xyz.udalny.vnolib.client.model.Server;
 import xyz.udalny.vnomobile.ClientHandler;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.viewholder.ListOfServersViewHolder;
 
 import lombok.extern.slf4j.Slf4j;

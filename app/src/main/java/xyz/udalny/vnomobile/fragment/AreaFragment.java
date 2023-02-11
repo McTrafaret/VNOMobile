@@ -20,7 +20,7 @@ import xyz.udalny.vnolib.command.servercommands.ROOKCommand;
 import xyz.udalny.vnolib.command.servercommands.RaCCommand;
 import xyz.udalny.vnolib.command.servercommands.RoCCommand;
 import xyz.udalny.vnomobile.ClientHandler;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.AreaAdapter;
 
 public class AreaFragment extends Fragment {

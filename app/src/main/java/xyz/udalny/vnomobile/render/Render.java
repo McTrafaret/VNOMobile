@@ -15,7 +15,7 @@ import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;

@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.io.File;
 import java.util.ArrayList;

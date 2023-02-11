@@ -19,7 +19,7 @@ import xyz.udalny.vnolib.client.model.Server;
 import xyz.udalny.vnolib.command.servercommands.PCCommand;
 import xyz.udalny.vnomobile.ClientHandler;
 import xyz.udalny.vnomobile.LoadingActivity;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.FavouritesAdapter;
 import xyz.udalny.vnomobile.adapter.OnServerEntryListener;
 import xyz.udalny.vnomobile.resource.DataDirectory;

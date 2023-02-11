@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;

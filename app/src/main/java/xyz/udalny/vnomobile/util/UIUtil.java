@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
 import androidx.appcompat.content.res.AppCompatResources;
 
 import xyz.udalny.vnolib.command.servercommands.enums.MessageColor;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.util.EnumMap;
 

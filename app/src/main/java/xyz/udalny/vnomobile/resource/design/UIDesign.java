@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import org.ini4j.Wini;
 

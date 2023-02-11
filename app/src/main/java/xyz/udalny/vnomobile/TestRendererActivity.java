@@ -10,7 +10,7 @@ import android.widget.Button;
 import xyz.udalny.vnolib.command.servercommands.MSCommand;
 import xyz.udalny.vnolib.command.servercommands.enums.MessageColor;
 import xyz.udalny.vnolib.command.servercommands.enums.SpritePosition;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import xyz.udalny.vnomobile.render.Engine;
 import xyz.udalny.vnomobile.resource.DataDirectory;

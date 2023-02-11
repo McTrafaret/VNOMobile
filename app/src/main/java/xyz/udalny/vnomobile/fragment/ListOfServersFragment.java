@@ -22,7 +22,7 @@ import xyz.udalny.vnolib.command.servercommands.PCCommand;
 import xyz.udalny.vnolib.exception.ConnectionException;
 import xyz.udalny.vnomobile.ClientHandler;
 import xyz.udalny.vnomobile.LoadingActivity;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.ListOfServersAdapter;
 import xyz.udalny.vnomobile.adapter.OnServerEntryListener;
 import xyz.udalny.vnomobile.resource.LogHandler;
@@ -117,14 +117,19 @@ public class ListOfServersFragment extends Fragment implements OnServerEntryList
         this.listOfServersView = view.findViewById(R.id.list_of_servers_view);
         this.listOfServersView.setAdapter(new ListOfServersAdapter(this));
         this.listOfServersView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        if(!client.getServers().isEmpty()) {
+            for(Server server : client.getServers()) {
+                serverIndexSet.add(server.getIndex());
+            }
+        }
         if (client.connectedToMaster()) {
+            client.subscribeToCommand(SDPCommand.class, this);
+            subscribedToServersInfo = true;
             try {
                 client.requestServers();
             } catch (Exception e) {
                 log.error("ServersListFragment: {}", e.toString());
             }
-            client.subscribeToCommand(SDPCommand.class, this);
-            subscribedToServersInfo = true;
         }
     }
 

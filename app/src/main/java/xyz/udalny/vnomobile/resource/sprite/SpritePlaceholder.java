@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.view.View;
 
 import com.bumptech.glide.Glide;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import lombok.extern.slf4j.Slf4j;
 

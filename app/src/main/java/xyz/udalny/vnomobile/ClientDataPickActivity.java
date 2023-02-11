@@ -28,7 +28,7 @@ import xyz.udalny.vnomobile.resource.DataDirectory;
 import xyz.udalny.vnomobile.resource.ResourceHandler;
 import xyz.udalny.vnomobile.util.FileUtil;
 
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.BufferedReader;
@@ -38,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ClientDataPickActivity extends AppCompatActivity implements OnDirectoryListener {
-
-    String testFile = "/storage/emulated/0/Clients/VA-11 HALL-A Client/data/characters/Gillian/char.ini";
 
     private RecyclerView listOfDataDirectoriesView;
     private FloatingActionButton addDataDirectoryButton;
@@ -136,19 +134,6 @@ public class ClientDataPickActivity extends AppCompatActivity implements OnDirec
             }
         });
         verifyStoragePermissions(this);
-        try(FileReader reader = new FileReader(testFile)) {
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            while(true) {
-                String line = bufferedReader.readLine();
-                if(line == null) {
-                    break;
-                }
-                log.info(line);
-            }
-        } catch (Exception ex) {
-            log.error("While reading file: ", ex);
-        }
-
     }
 
     private void showToast(String message) {

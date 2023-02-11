@@ -6,7 +6,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import lombok.extern.slf4j.Slf4j;
 import xyz.udalny.vnolib.client.model.Server;

@@ -80,8 +80,8 @@ public class Client {
         commandHandler = new PublisherCommandHandler(commandsToRead, this);
     }
 
-    public List<Server> getServers() {
-        return servers;
+    public synchronized List<Server> getServers() {
+        return new ArrayList<>(servers);
     }
 
     public void setUsername(String username) {
@@ -160,6 +160,9 @@ public class Client {
 
     public Area getAreaById(int id) {
         synchronized (areaLock) {
+            if(id <= 0) {
+                return areas[0];
+            }
             return areas[id - 1];
         }
     }
@@ -172,6 +175,9 @@ public class Client {
 
     public void changeAreaPopulation(int areaId, int newPopulation) {
         synchronized (areaLock) {
+            if(areaId <= 0) {
+                return;
+            }
             this.areas[areaId - 1].setPopulation(newPopulation);
         }
     }

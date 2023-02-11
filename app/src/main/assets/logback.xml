@@ -3,6 +3,7 @@
 
     <!-- this is the app local data area so that we do not need storage permission to write there -->
     <property name="LOG_HOME" value="${DATA_DIR}" />
+    <property name="EXT_FILES_DIR" value="${EXT_DIR:-/sdcard}/Android/data/${PACKAGE_NAME}/files"/>
 
     <appender name="Logcat" class="ch.qos.logback.classic.android.LogcatAppender">
         <encoder>
@@ -11,9 +12,10 @@
     </appender>
 
     <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/app.log</file>
+<!--        <file>${LOG_HOME}/app.log</file>-->
+        <file>${EXT_FILES_DIR}/log/foo.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/app.%i.log</fileNamePattern>
+            <fileNamePattern>${EXT_FILES_DIR}/app.%i.log</fileNamePattern>
             <minIndex>1</minIndex>
             <maxIndex>2</maxIndex>
         </rollingPolicy>

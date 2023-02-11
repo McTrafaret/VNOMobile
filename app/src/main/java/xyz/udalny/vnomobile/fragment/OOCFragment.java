@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import xyz.udalny.vnolib.client.Client;
 import xyz.udalny.vnomobile.ClientHandler;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 import xyz.udalny.vnomobile.adapter.StringListAdapter;
 import xyz.udalny.vnomobile.resource.LogHandler;
 import xyz.udalny.vnomobile.resource.OOCLogListener;

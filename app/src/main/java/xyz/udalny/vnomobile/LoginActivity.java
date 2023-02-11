@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import xyz.udalny.vnolib.client.OnCommand;
 import xyz.udalny.vnolib.command.ascommands.NoCommand;
 import xyz.udalny.vnolib.command.ascommands.VNALCommand;
-import com.example.vnomobile.R;
+import xyz.udalny.vnomobile.R;
 
 import java.io.BufferedReader;
 import java.io.File;

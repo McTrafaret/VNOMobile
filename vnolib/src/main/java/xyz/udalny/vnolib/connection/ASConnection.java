@@ -1,11 +1,12 @@
 package xyz.udalny.vnolib.connection;
 
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import xyz.udalny.vnolib.command.BaseCommand;
 import xyz.udalny.vnolib.command.ascommands.COCommand;
 import xyz.udalny.vnolib.command.ascommands.RPSCommand;
-
-import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.LinkedBlockingQueue;
+import xyz.udalny.vnolib.command.ascommands.VERCommand;
 
 public class ASConnection extends ServerConnection {
 
@@ -18,6 +19,7 @@ public class ASConnection extends ServerConnection {
     }
 
     public void sendLoginRequest(String login, String password) throws NoSuchAlgorithmException {
+        sendCommand(new VERCommand());
         sendCommand(new COCommand(login, password));
     }
 
